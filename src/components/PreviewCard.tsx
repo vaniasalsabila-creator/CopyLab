@@ -1,6 +1,7 @@
 import type { CopyFields, Lang } from '../types'
 import { countChars, LIMITS } from '../lib/chars'
 import { CounterLabel } from './CharField'
+import { FormattedText, InlineText } from './FormattedText'
 import { Icon } from './icons'
 import type { ReactNode } from 'react'
 
@@ -32,7 +33,7 @@ function ChatBubble({ text }: { text: string }) {
     <div className="relative ml-1.5 max-w-full rounded-lg rounded-tl-none bg-white px-2.5 py-[7px] text-[13px] leading-relaxed text-[#111b21] shadow-[0_1px_0.5px_rgba(0,0,0,0.13)]">
       <ChatBubbleTail />
       {text ? (
-        <span className="whitespace-pre-wrap break-words">{text}</span>
+        <FormattedText text={text} />
       ) : (
         <span className="italic text-[#8696a0]">No copy written yet.</span>
       )}
@@ -107,10 +108,10 @@ function LockScreenNotification({ title, subtitle }: { title: string; subtitle: 
         <img src={APP_ICON_SRC} alt="" className="h-8 w-8 shrink-0 rounded-[8px] object-cover shadow-sm" />
         <div className="min-w-0 flex-1">
           <div className="text-xs font-semibold leading-snug text-white">
-            {title || <span className="italic font-normal text-white/50">No title yet</span>}
+            {title ? <InlineText text={title} /> : <span className="italic font-normal text-white/50">No title yet</span>}
           </div>
           <div className="text-xs leading-snug text-white/85">
-            {subtitle || <span className="italic text-white/50">No subtitle yet</span>}
+            {subtitle ? <FormattedText text={subtitle} /> : <span className="italic text-white/50">No subtitle yet</span>}
           </div>
         </div>
       </div>
@@ -177,6 +178,65 @@ export function PushPreview({ copy, lang }: { copy: CopyFields; lang: Lang | 'bo
               <CounterLabel count={countChars(copy.push.title[l])} max={LIMITS.pushTitle} />
               <CounterLabel count={countChars(copy.push.subtitle[l])} max={LIMITS.pushSubtitle} />
             </div>
+          </LangBlock>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function SMSBubble({ text }: { text: string }) {
+  return (
+    <div className="relative max-w-[85%] rounded-2xl rounded-bl-sm bg-[#e9e9eb] px-3.5 py-2 text-[13px] leading-relaxed text-[#111111] shadow-[0_1px_0.5px_rgba(0,0,0,0.08)]">
+      {text ? <FormattedText text={text} /> : <span className="italic text-[#8e8e93]">No copy written yet.</span>}
+    </div>
+  )
+}
+
+export function SMSPreview({ copy, lang }: { copy: CopyFields; lang: Lang | 'both' }) {
+  const langs: Lang[] = lang === 'both' ? ['en', 'id'] : [lang]
+  return (
+    <div className="rounded-lg border border-line bg-surface-2 p-3">
+      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-ink-muted">
+        <Icon name="sms" size={13} />
+        SMS
+      </div>
+
+      <div className="mx-auto w-[360px] overflow-hidden rounded-[26px] bg-white shadow-sm">
+        <div className="px-3.5 pb-2 pt-3">
+          <div className="flex items-center justify-between text-[#111111]">
+            <span className="text-[11px] font-semibold">9:41</span>
+            <div className="flex items-center gap-1">
+              <Icon name="signal" size={12} />
+              <Icon name="wifi" size={13} />
+              <Icon name="battery" size={15} />
+            </div>
+          </div>
+          <div className="mt-2 flex flex-col items-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#8e8e93] text-white">
+              <Icon name="sms" size={16} />
+            </div>
+            <div className="mt-1 text-[12px] font-medium text-[#111111]">tiket.com</div>
+            <div className="text-[10.5px] text-[#8e8e93]">Text Message</div>
+          </div>
+        </div>
+
+        <div className="space-y-3 border-t border-[#e5e5ea] px-3 py-4">
+          <div className="flex justify-center">
+            <span className="text-[10.5px] font-medium text-[#8e8e93]">Today 9:41 AM</span>
+          </div>
+          {langs.map((l) => (
+            <div key={l} className="flex justify-start">
+              <SMSBubble text={copy.sms[l]} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 space-y-2">
+        {langs.map((l) => (
+          <LangBlock key={l} lang={lang === 'both' ? l : undefined}>
+            <CounterLabel count={countChars(copy.sms[l])} max={LIMITS.sms} warnAt={LIMITS.smsWarn} />
           </LangBlock>
         ))}
       </div>

@@ -14,6 +14,8 @@ export const LIMITS = {
   whatsappWarn: 950,
   pushTitle: 50,
   pushSubtitle: 75,
+  sms: 160,
+  smsWarn: 145,
 } as const
 
 export type LimitTone = 'ok' | 'warn' | 'over'

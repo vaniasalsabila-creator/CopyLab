@@ -51,6 +51,10 @@ export const SAMPLE_OPTIONS: Option[] = [
         title: { en: 'Add flight protection', id: 'Tambah perlindungan pesawat' },
         subtitle: { en: 'Stay covered if your flight is delayed.', id: 'Tetap terlindungi jika penerbangan tertunda.' },
       },
+      sms: {
+        en: 'tiket.com: Add Flight Delay Service to your booking and stay covered if your flight is delayed or cancelled.',
+        id: 'tiket.com: Tambahkan Flight Delay Service pada pemesananmu, tetap terlindungi jika penerbangan tertunda/dibatalkan.',
+      },
     },
   },
   {
@@ -66,6 +70,10 @@ export const SAMPLE_OPTIONS: Option[] = [
       push: {
         title: { en: 'Protect your trip ✈️', id: 'Lindungi perjalananmu ✈️' },
         subtitle: { en: 'Flight disruptions can happen. Stay protected.', id: 'Penerbangan bisa terganggu. Tetap terlindungi.' },
+      },
+      sms: {
+        en: 'tiket.com: Get compensation if your flight is delayed or cancelled. Add Flight Delay Service now and stay protected.',
+        id: 'tiket.com: Dapatkan kompensasi jika penerbanganmu tertunda/dibatalkan. Tambahkan Flight Delay Service sekarang.',
       },
     },
   },
@@ -83,6 +91,10 @@ export const SAMPLE_OPTIONS: Option[] = [
         title: { en: 'A little protection', id: 'Perlindungan kecil, berarti' },
         subtitle: { en: 'Get covered for unexpected flight disruptions.', id: 'Lindungi dirimu dari gangguan penerbangan.' },
       },
+      sms: {
+        en: 'tiket.com: A little protection now means compensation later. Add Flight Delay Service before you fly.',
+        id: 'tiket.com: Sedikit perlindungan sekarang, kompensasi nanti. Tambahkan Flight Delay Service sebelum terbang.',
+      },
     },
   },
   {
@@ -98,6 +110,10 @@ export const SAMPLE_OPTIONS: Option[] = [
       push: {
         title: { en: 'Get paid if delayed', id: 'Tertunda? Dapat kompensasi' },
         subtitle: { en: 'Compensation when your flight is disrupted.', id: 'Kompensasi saat penerbanganmu terganggu.' },
+      },
+      sms: {
+        en: 'tiket.com: Get paid if your flight is delayed. Add Flight Delay Service for compensation on every disruption.',
+        id: 'tiket.com: Dapat kompensasi jika penerbangan tertunda. Tambahkan Flight Delay Service sekarang.',
       },
     },
   },
@@ -115,6 +131,10 @@ export const SAMPLE_OPTIONS: Option[] = [
         title: { en: 'Delay? You’re covered', id: 'Delay? Kamu tetap aman' },
         subtitle: { en: 'Compensation for disruptions — add it before you fly.', id: 'Kompensasi jika terganggu — tambahkan sebelum terbang.' },
       },
+      sms: {
+        en: 'tiket.com: Delay? You’re covered. Add Flight Delay Service for compensation if your flight is delayed or cancelled.',
+        id: 'tiket.com: Delay? Kamu tetap aman. Tambahkan Flight Delay Service untuk kompensasi jika tertunda/dibatalkan.',
+      },
     },
   },
   {
@@ -130,6 +150,10 @@ export const SAMPLE_OPTIONS: Option[] = [
       push: {
         title: { en: 'Travelers add this ✈️', id: 'Traveler lain menambah ini' },
         subtitle: { en: 'Join thousands who fly with extra protection.', id: 'Bergabunglah dengan ribuan traveler terlindungi.' },
+      },
+      sms: {
+        en: 'tiket.com: Thousands of travelers add Flight Delay Service before flying. Join them and get compensation for delays.',
+        id: 'tiket.com: Ribuan traveler menambahkan Flight Delay Service sebelum terbang. Dapatkan kompensasi jika delay.',
       },
     },
   },
@@ -147,6 +171,10 @@ export const SAMPLE_OPTIONS: Option[] = [
         title: { en: 'Peace of mind, booked', id: 'Tenang sejak dipesan' },
         subtitle: { en: 'Travelers choose FDS for unexpected delays.', id: 'Traveler pilih FDS untuk antisipasi delay.' },
       },
+      sms: {
+        en: 'tiket.com: Most travelers say Flight Delay Service gives peace of mind. Add it and stay covered on your next trip.',
+        id: 'tiket.com: Sebagian besar traveler merasa tenang dengan Flight Delay Service. Tambahkan untuk perjalanan berikutnya.',
+      },
     },
   },
   {
@@ -163,6 +191,10 @@ export const SAMPLE_OPTIONS: Option[] = [
         title: { en: 'Covered, like they are', id: 'Terlindungi, seperti mereka' },
         subtitle: { en: 'Compensation for delays — trusted by travelers.', id: 'Kompensasi delay — dipercaya traveler.' },
       },
+      sms: {
+        en: 'tiket.com: Protect your trip like thousands of travelers do. Add Flight Delay Service for compensation if delayed.',
+        id: 'tiket.com: Lindungi perjalananmu seperti ribuan traveler. Tambahkan Flight Delay Service untuk kompensasi delay.',
+      },
     },
   },
   {
@@ -178,6 +210,10 @@ export const SAMPLE_OPTIONS: Option[] = [
       push: {
         title: { en: 'Backup for your flight', id: 'Cadangan untuk penerbangan' },
         subtitle: { en: 'Get paid if delayed. Travelers already do this.', id: 'Dapat kompensasi jika delay. Traveler sudah pakai.' },
+      },
+      sms: {
+        en: 'tiket.com: Get compensation when disrupted, the same backup travelers rely on. Add Flight Delay Service now.',
+        id: 'tiket.com: Dapatkan kompensasi saat terganggu, backup yang dipercaya traveler. Tambahkan Flight Delay Service sekarang.',
       },
     },
   },

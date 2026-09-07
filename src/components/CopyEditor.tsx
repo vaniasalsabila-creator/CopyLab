@@ -3,11 +3,12 @@ import { useStore } from '../store'
 import { LIMITS } from '../lib/chars'
 import { CopyField } from './CharField'
 import { Button, EmptyState } from './ui'
-import type { Lang } from '../types'
+import type { Channel, Lang } from '../types'
 
-const CHANNEL_TABS: { id: 'whatsapp' | 'push'; label: string }[] = [
+const CHANNEL_TABS: { id: Channel; label: string }[] = [
   { id: 'whatsapp', label: 'WhatsApp Blast' },
   { id: 'push', label: 'Push Notification' },
+  { id: 'sms', label: 'SMS' },
 ]
 
 const LANG_TABS: { id: 'en' | 'id' | 'both'; label: string }[] = [
@@ -92,7 +93,7 @@ export function CopyEditor() {
               ))}
             </div>
           </div>
-        ) : (
+        ) : channel === 'push' ? (
           <div className="space-y-6">
             <div>
               <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">Title</h3>
@@ -125,6 +126,24 @@ export function CopyEditor() {
                   />
                 ))}
               </div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">SMS</h3>
+            <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
+              {langs.map((lang) => (
+                <CopyField
+                  key={lang}
+                  label={lang === 'en' ? 'English' : 'Indonesian'}
+                  value={option.copy.sms[lang]}
+                  onChange={(v) => updateCopy(option.id, (c) => ({ ...c, sms: { ...c.sms, [lang]: v } }))}
+                  placeholder={lang === 'en' ? 'Write your SMS message...' : 'Tulis pesan SMS dalam Bahasa Indonesia...'}
+                  max={LIMITS.sms}
+                  warnAt={LIMITS.smsWarn}
+                  minRows={4}
+                />
+              ))}
             </div>
           </div>
         )}

@@ -1,4 +1,4 @@
-export type Channel = 'whatsapp' | 'push'
+export type Channel = 'whatsapp' | 'push' | 'sms'
 export type Lang = 'en' | 'id'
 export type EditorLang = 'en' | 'id' | 'both'
 export type PreviewView = 'preview' | 'compare'
@@ -35,6 +35,7 @@ export type CopyFields = {
     title: { en: string; id: string }
     subtitle: { en: string; id: string }
   }
+  sms: { en: string; id: string }
 }
 
 export type Option = {

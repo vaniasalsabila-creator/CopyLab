@@ -9,6 +9,7 @@ export function emptyCopy() {
       title: { en: '', id: '' },
       subtitle: { en: '', id: '' },
     },
+    sms: { en: '', id: '' },
   }
 }
 

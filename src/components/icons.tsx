@@ -38,6 +38,13 @@ export type IconName =
   | 'badge-check'
   | 'flashlight'
   | 'camera'
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'quote'
+  | 'list'
+  | 'paragraph'
+  | 'sms'
 
 const paths: Record<IconName, ReactElement> = {
   search: (
@@ -234,6 +241,56 @@ const paths: Record<IconName, ReactElement> = {
     <>
       <path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" />
       <circle cx="12" cy="13" r="3.5" />
+    </>
+  ),
+  bold: (
+    <>
+      <path d="M6 4h8a4 4 0 0 1 0 8H6z" />
+      <path d="M6 12h9a4 4 0 0 1 0 8H6z" />
+    </>
+  ),
+  italic: (
+    <>
+      <path d="M19 4h-9" />
+      <path d="M14 20H5" />
+      <path d="m15 4-6 16" />
+    </>
+  ),
+  underline: (
+    <>
+      <path d="M6 4v6a6 6 0 0 0 12 0V4" />
+      <path d="M4 20h16" />
+    </>
+  ),
+  quote: (
+    <>
+      <path d="M7 15c2.5 0 3.5-1.7 3.5-4V6a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v4.5A1.5 1.5 0 0 0 5.5 12c.8 0 1 .3 1 1v.5C6.5 14.5 6 15 5 15" />
+      <path d="M17 15c2.5 0 3.5-1.7 3.5-4V6a1 1 0 0 0-1-1h-4.5a1 1 0 0 0-1 1v4.5a1.5 1.5 0 0 0 1.5 1.5c.8 0 1 .3 1 1v.5c0 1-.5 1.5-1.5 1.5" />
+    </>
+  ),
+  list: (
+    <>
+      <circle cx="4" cy="6" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="12" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="18" r="1.1" fill="currentColor" stroke="none" />
+      <path d="M8 6h12" />
+      <path d="M8 12h12" />
+      <path d="M8 18h12" />
+    </>
+  ),
+  paragraph: (
+    <>
+      <path d="M13 4v16" />
+      <path d="M18 4v16" />
+      <path d="M18 4h-7.5a4.5 4.5 0 0 0 0 9H13" />
+    </>
+  ),
+  sms: (
+    <>
+      <path d="M3.5 5.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-4.5 4v-4H5.5a2 2 0 0 1-2-2Z" />
+      <circle cx="8" cy="10" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="10" r="1" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="10" r="1" fill="currentColor" stroke="none" />
     </>
   ),
 }

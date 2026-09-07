@@ -14,6 +14,8 @@ const ROWS: Row[] = [
   { key: 'pt-id', label: 'Push Title ID', max: LIMITS.pushTitle, get: (o) => o.copy.push.title.id },
   { key: 'ps-en', label: 'Push Subtitle EN', max: LIMITS.pushSubtitle, get: (o) => o.copy.push.subtitle.en },
   { key: 'ps-id', label: 'Push Subtitle ID', max: LIMITS.pushSubtitle, get: (o) => o.copy.push.subtitle.id },
+  { key: 'sms-en', label: 'SMS EN', max: LIMITS.sms, warnAt: LIMITS.smsWarn, get: (o) => o.copy.sms.en },
+  { key: 'sms-id', label: 'SMS ID', max: LIMITS.sms, warnAt: LIMITS.smsWarn, get: (o) => o.copy.sms.id },
 ]
 
 export function CompareTable({ options }: { options: Option[] }) {

@@ -502,6 +502,17 @@ export const useStore = create<Store>()(
     }),
     {
       name: 'copylab-workspace',
+      version: 1,
+      migrate: (persistedState, version) => {
+        const state = persistedState as { options?: Array<{ copy?: { sms?: { en: string; id: string } } }> }
+        if (version < 1 && state.options) {
+          state.options = state.options.map((o) => ({
+            ...o,
+            copy: { ...o.copy, sms: o.copy?.sms ?? { en: '', id: '' } },
+          }))
+        }
+        return state
+      },
       partialize: (s) => ({
         folders: s.folders,
         projects: s.projects,
