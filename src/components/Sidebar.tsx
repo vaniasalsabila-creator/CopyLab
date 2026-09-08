@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useStore } from '../store'
-import { Icon } from './icons'
+import { useAuthStore } from '../authStore'
+import { Icon, Logo } from './icons'
 import { OverflowMenu } from './ui'
 import type { SidebarNav } from '../types'
 
@@ -50,6 +51,8 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
   const selectFolder = useStore((s) => s.selectFolder)
   const setModal = useStore((s) => s.setModal)
   const deleteFolder = useStore((s) => s.deleteFolder)
+  const email = useAuthStore((s) => s.session?.user.email)
+  const signOut = useAuthStore((s) => s.signOut)
 
   const q = search.trim().toLowerCase()
   const visibleFolders = useMemo(() => {
@@ -61,12 +64,11 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
   }, [folders, projects, q])
 
   return (
-    <div className={`flex h-full flex-col gap-5 overflow-y-auto overflow-x-hidden px-3.5 py-5 ${collapsed ? 'lg:px-2' : ''}`}>
+    <div className="flex h-full flex-col">
+      <div className={`flex flex-1 flex-col gap-5 overflow-y-auto overflow-x-hidden px-3.5 py-5 ${collapsed ? 'lg:px-2' : ''}`}>
       <div className={`flex items-center justify-between gap-2 px-1.5 ${collapsed ? 'lg:justify-center lg:px-0' : ''}`}>
         <div className={`flex min-w-0 items-center gap-2 ${collapsed ? 'lg:gap-0' : ''}`}>
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-btn text-[13px] font-bold text-btn-fg">
-            C
-          </div>
+          <Logo size={28} />
           <div className={`min-w-0 ${collapsed ? 'lg:hidden' : ''}`}>
             <div className="truncate text-[14px] font-semibold leading-tight text-ink">CopyLab</div>
             <div className="truncate text-[11px] leading-tight text-ink-faint">Copy Testing Workspace</div>
@@ -79,18 +81,27 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
         >
           <Icon name="close" size={16} />
         </button>
+        <button
+          onClick={toggleSidebarCollapsed}
+          aria-label="Collapse sidebar"
+          title="Collapse sidebar"
+          className={`hidden h-7 w-7 shrink-0 items-center justify-center rounded-md text-ink-faint transition-all duration-150 hover:bg-surface-3 hover:text-ink active:scale-95 lg:flex ${
+            collapsed ? 'lg:hidden' : ''
+          }`}
+        >
+          <Icon name="chevron-left" size={15} />
+        </button>
       </div>
 
       <button
         onClick={toggleSidebarCollapsed}
-        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        className={`hidden items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink lg:flex ${
-          collapsed ? 'lg:justify-center' : ''
+        aria-label="Expand sidebar"
+        title="Expand sidebar"
+        className={`hidden items-center justify-center self-center rounded-md border border-transparent p-1.5 text-ink-muted transition-all duration-150 hover:border-line hover:bg-surface-3 hover:text-ink active:scale-95 ${
+          collapsed ? 'lg:flex' : 'lg:hidden'
         }`}
       >
-        <Icon name={collapsed ? 'chevron-right' : 'chevron-left'} size={15} />
-        <span className={collapsed ? 'lg:hidden' : ''}>Collapse</span>
+        <Icon name="chevron-right" size={14} />
       </button>
 
       <label className={`relative block ${collapsed ? 'lg:hidden' : ''}`}>
@@ -184,28 +195,46 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
           <span className={collapsed ? 'lg:hidden' : ''}>New Folder</span>
         </button>
       </div>
+      </div>
 
-      <div className={`mt-auto flex items-center gap-2 ${collapsed ? 'lg:flex-col' : ''}`}>
-        <div
-          className={`flex flex-1 items-center gap-2 rounded-md border border-line px-2.5 py-2 ${
-            collapsed ? 'lg:flex-none lg:justify-center lg:px-0' : ''
-          }`}
-        >
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-3 text-[11px] font-semibold text-ink-muted">
-            U
+      <div className={`shrink-0 border-t border-line px-3.5 py-3 ${collapsed ? 'lg:px-2' : ''}`}>
+        <div className={`flex items-center gap-2 ${collapsed ? 'lg:flex-col' : ''}`}>
+          <div
+            className={`group flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-3 ${
+              collapsed ? 'lg:flex-none lg:justify-center lg:px-0' : ''
+            }`}
+          >
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-btn text-[11px] font-semibold text-btn-fg shadow-sm">
+              {email ? email[0]!.toUpperCase() : 'U'}
+            </div>
+            <div className={`min-w-0 flex-1 ${collapsed ? 'lg:hidden' : ''}`}>
+              <div className="truncate text-[12px] font-medium leading-tight text-ink">{email ?? 'Workspace member'}</div>
+              <div className="truncate text-[10.5px] leading-tight text-ink-faint">Signed in</div>
+            </div>
           </div>
-          <div className={`min-w-0 flex-1 ${collapsed ? 'lg:hidden' : ''}`}>
-            <div className="truncate text-[12px] font-medium text-ink">Workspace member</div>
+          <div
+            className={`flex items-stretch overflow-hidden rounded-lg border border-line bg-surface shadow-sm ${
+              collapsed ? 'lg:flex-col lg:divide-x-0 lg:divide-y' : 'divide-x divide-line'
+            }`}
+          >
+            <button
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="flex h-8 w-8 shrink-0 items-center justify-center text-ink-muted transition-colors duration-150 hover:bg-surface-3 hover:text-ink active:scale-90"
+            >
+              <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
+            </button>
+            <button
+              onClick={() => signOut()}
+              aria-label="Sign out"
+              title="Sign out"
+              className="flex h-8 w-8 shrink-0 items-center justify-center text-ink-muted transition-colors duration-150 hover:bg-red-500/10 hover:text-red-600 active:scale-90"
+            >
+              <Icon name="log-out" size={15} />
+            </button>
           </div>
         </div>
-        <button
-          onClick={toggleTheme}
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line text-ink-muted transition-all duration-150 hover:bg-surface-3 hover:text-ink active:scale-90"
-        >
-          <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
-        </button>
       </div>
     </div>
   )

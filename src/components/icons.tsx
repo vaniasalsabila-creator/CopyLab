@@ -45,6 +45,7 @@ export type IconName =
   | 'list'
   | 'paragraph'
   | 'sms'
+  | 'log-out'
 
 const paths: Record<IconName, ReactElement> = {
   search: (
@@ -293,6 +294,32 @@ const paths: Record<IconName, ReactElement> = {
       <circle cx="16" cy="10" r="1" fill="currentColor" stroke="none" />
     </>
   ),
+  'log-out': (
+    <>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
+    </>
+  ),
+}
+
+export function Logo({ size = 28, className = '' }: { size?: number; className?: string }) {
+  return (
+    <div
+      className={`flex shrink-0 items-center justify-center rounded-[9px] bg-btn text-btn-fg shadow-[0_1px_2px_rgba(0,0,0,0.2)] ${className}`}
+      style={{ width: size, height: size }}
+    >
+      <svg width={size * 0.6} height={size * 0.6} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M3.5 5.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-4.5 4v-4H5.5a2 2 0 0 1-2-2Z"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          strokeLinejoin="round"
+        />
+        <path d="M12.5 6.7l.85 2.05 2.05.85-2.05.85-.85 2.05-.85-2.05-2.05-.85 2.05-.85Z" fill="currentColor" />
+      </svg>
+    </div>
+  )
 }
 
 export function Icon({ name, size = 16, className, ...props }: { name: IconName; size?: number } & SVGProps<SVGSVGElement>) {

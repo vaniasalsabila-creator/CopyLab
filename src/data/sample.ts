@@ -1,3 +1,4 @@
+import { uid } from '../lib/ids'
 import type { Folder, Option, Project, Variation } from '../types'
 
 const t = Date.UTC(2026, 8, 1, 4, 0, 0)
@@ -218,3 +219,25 @@ export const SAMPLE_OPTIONS: Option[] = [
     },
   },
 ]
+
+/**
+ * The SAMPLE_* constants above use fixed, human-readable ids for readability in this
+ * file, but those ids are only unique *within* this file — every new Supabase account
+ * gets seeded from the same constants, and table primary keys are global, not scoped
+ * per user. Reusing the literal ids across accounts would collide on the first insert
+ * for every user after the first. This produces a fresh, globally-unique copy (new
+ * uid() per row) with all foreign keys rewired to match, safe to insert for any user.
+ */
+export function createSeedWorkspace(): { folders: Folder[]; projects: Project[]; variations: Variation[]; options: Option[] } {
+  const folderIdMap = new Map(SAMPLE_FOLDERS.map((f) => [f.id, uid()]))
+  const projectIdMap = new Map(SAMPLE_PROJECTS.map((p) => [p.id, uid()]))
+  const variationIdMap = new Map(SAMPLE_VARIATIONS.map((v) => [v.id, uid()]))
+  const optionIdMap = new Map(SAMPLE_OPTIONS.map((o) => [o.id, uid()]))
+
+  const folders = SAMPLE_FOLDERS.map((f) => ({ ...f, id: folderIdMap.get(f.id)! }))
+  const projects = SAMPLE_PROJECTS.map((p) => ({ ...p, id: projectIdMap.get(p.id)!, folderId: folderIdMap.get(p.folderId)! }))
+  const variations = SAMPLE_VARIATIONS.map((v) => ({ ...v, id: variationIdMap.get(v.id)!, projectId: projectIdMap.get(v.projectId)! }))
+  const options = SAMPLE_OPTIONS.map((o) => ({ ...o, id: optionIdMap.get(o.id)!, variationId: variationIdMap.get(o.variationId)! }))
+
+  return { folders, projects, variations, options }
+}

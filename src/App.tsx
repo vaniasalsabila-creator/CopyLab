@@ -1,15 +1,23 @@
 import { useEffect } from 'react'
 import { useStore } from './store'
+import { useAuthStore } from './authStore'
 import { Sidebar } from './components/Sidebar'
 import { ProjectList } from './components/ProjectList'
 import { Workspace } from './components/Workspace'
 import { PreviewMode } from './components/PreviewMode'
 import { Modals } from './components/Modals'
 import { Toasts } from './components/Toasts'
-import { Icon } from './components/icons'
+import { Login } from './components/Login'
+import { Icon, Logo } from './components/icons'
 import type { MobileTab } from './types'
 
 export default function App() {
+  const session = useAuthStore((s) => s.session)
+  const authInitialized = useAuthStore((s) => s.initialized)
+  const initAuth = useAuthStore((s) => s.init)
+  const hydrated = useStore((s) => s.hydrated)
+  const loadWorkspace = useStore((s) => s.loadWorkspace)
+  const resetWorkspace = useStore((s) => s.resetWorkspace)
   const theme = useStore((s) => s.theme)
   const selectedProjectId = useStore((s) => s.selectedProjectId)
   const project = useStore((s) => s.projects.find((p) => p.id === s.selectedProjectId))
@@ -29,6 +37,20 @@ export default function App() {
     document.documentElement.classList.toggle('dark', theme === 'dark')
   }, [theme])
 
+  useEffect(() => {
+    initAuth()
+  }, [initAuth])
+
+  useEffect(() => {
+    if (!authInitialized) return
+    if (session?.user.id) {
+      loadWorkspace(session.user.id)
+    } else {
+      resetWorkspace()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authInitialized, session?.user.id])
+
   function onMobileTab(tab: MobileTab) {
     setMobileTab(tab)
     if (tab === 'edit') closePreview()
@@ -40,6 +62,18 @@ export default function App() {
       setPreviewView('compare')
       openPreview()
     }
+  }
+
+  if (!authInitialized) {
+    return <div className="flex h-full items-center justify-center bg-canvas text-sm text-ink-faint">Loading…</div>
+  }
+
+  if (!session) {
+    return <Login />
+  }
+
+  if (!hydrated) {
+    return <div className="flex h-full items-center justify-center bg-canvas text-sm text-ink-faint">Loading your workspace…</div>
   }
 
   return (
@@ -56,7 +90,7 @@ export default function App() {
             <Icon name="menu" size={18} />
           </button>
           <div className="flex items-center gap-1.5">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-btn text-[11px] font-bold text-btn-fg">C</div>
+            <Logo size={24} />
             <span className="text-[14px] font-semibold text-ink">CopyLab</span>
           </div>
         </div>
