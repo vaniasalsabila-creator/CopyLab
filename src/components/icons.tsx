@@ -21,6 +21,9 @@ export type IconName =
   | 'move'
   | 'menu'
   | 'eye'
+  | 'eye-off'
+  | 'mail'
+  | 'lock'
   | 'grid'
   | 'clock'
   | 'whatsapp'
@@ -143,6 +146,25 @@ const paths: Record<IconName, ReactElement> = {
     <>
       <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
       <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  'eye-off': (
+    <>
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-6.5 0-10-7-10-7a18.45 18.45 0 0 1 4.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19" />
+      <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+      <path d="M1 1l22 22" />
+    </>
+  ),
+  mail: (
+    <>
+      <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" />
+      <path d="m3.5 6 8.5 6.5L20.5 6" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="4" y="10.5" width="16" height="10" rx="2.2" />
+      <path d="M7.5 10.5V7.2a4.5 4.5 0 0 1 9 0v3.3" />
     </>
   ),
   grid: (

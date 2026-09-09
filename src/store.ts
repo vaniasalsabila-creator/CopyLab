@@ -1,7 +1,6 @@
 import { create } from 'zustand'
-import { createSeedWorkspace } from './data/sample'
 import { cloneCopy, emptyCopy, uid } from './lib/ids'
-import { db, claimNewUser, fetchWorkspace, insertSeedEntities, type WorkspaceSettings } from './lib/db'
+import { db, claimNewUser, fetchWorkspace, type WorkspaceSettings } from './lib/db'
 import { useAuthStore } from './authStore'
 import type {
   Channel,
@@ -215,24 +214,20 @@ export const useStore = create<Store>()((set, get) => ({
     if (!settings) {
       // No settings row yet could mean either a brand-new account, or a concurrent
       // load already in flight for it — claimNewUser uses an atomic DB insert to
-      // decide which, so at most one caller ever seeds the starter content.
-      const seed = createSeedWorkspace()
+      // decide which, so at most one caller ever claims the starter settings row.
+      // New accounts start with a completely empty workspace — no seeded folders,
+      // projects, variations, or options.
       const starterSettings: WorkspaceSettings = {
-        favorites: seed.projects[0] ? [seed.projects[0].id] : [],
-        recent: seed.projects.slice(0, 2).map((p) => p.id),
+        favorites: [],
+        recent: [],
         sidebarCollapsed: false,
         theme: getInitialTheme(),
       }
       const claimed = await claimNewUser(userId, starterSettings)
       if (claimed) {
-        await insertSeedEntities(userId, seed)
-        folders = seed.folders
-        projects = seed.projects
-        variations = seed.variations
-        options = seed.options
         settings = starterSettings
       } else {
-        // Another concurrent call already seeded this account — re-fetch its result.
+        // Another concurrent call already claimed this account — re-fetch its result.
         const fresh = await fetchWorkspace(userId)
         folders = fresh.folders
         projects = fresh.projects

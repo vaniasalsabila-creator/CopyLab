@@ -85,7 +85,7 @@ export function CopyEditor() {
                   label={lang === 'en' ? 'English' : 'Indonesian'}
                   value={option.copy.whatsapp[lang]}
                   onChange={(v) => updateCopy(option.id, (c) => ({ ...c, whatsapp: { ...c.whatsapp, [lang]: v } }))}
-                  placeholder={lang === 'en' ? 'Write your WhatsApp message...' : 'Tulis pesan WhatsApp dalam Bahasa Indonesia...'}
+                  placeholder={lang === 'en' ? 'Enter your message' : 'Masukkan pesan Anda'}
                   max={LIMITS.whatsapp}
                   warnAt={LIMITS.whatsappWarn}
                   minRows={7}
@@ -138,7 +138,7 @@ export function CopyEditor() {
                   label={lang === 'en' ? 'English' : 'Indonesian'}
                   value={option.copy.sms[lang]}
                   onChange={(v) => updateCopy(option.id, (c) => ({ ...c, sms: { ...c.sms, [lang]: v } }))}
-                  placeholder={lang === 'en' ? 'Write your SMS message...' : 'Tulis pesan SMS dalam Bahasa Indonesia...'}
+                  placeholder={lang === 'en' ? 'Enter your message' : 'Masukkan pesan Anda'}
                   max={LIMITS.sms}
                   warnAt={LIMITS.smsWarn}
                   minRows={4}

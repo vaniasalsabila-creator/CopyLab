@@ -54,6 +54,9 @@ export function ProjectList() {
   if (folders.length === 0) {
     return (
       <div className="flex flex-1 flex-col">
+        <div className="border-b border-line px-6 py-4 lg:px-10">
+          <h1 className="text-lg font-semibold tracking-tight text-ink">Copy Lab</h1>
+        </div>
         <EmptyState
           icon="folder"
           title="Create your first folder"
