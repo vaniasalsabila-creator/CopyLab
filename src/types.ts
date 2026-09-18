@@ -1,4 +1,4 @@
-export type Channel = 'whatsapp' | 'push' | 'sms'
+export type Channel = 'whatsapp' | 'push' | 'sms' | 'flightAssistant'
 export type Lang = 'en' | 'id'
 export type EditorLang = 'en' | 'id' | 'both'
 export type PreviewView = 'preview' | 'compare'
@@ -36,6 +36,10 @@ export type CopyFields = {
     subtitle: { en: string; id: string }
   }
   sms: { en: string; id: string }
+  flightAssistant: {
+    title: { en: string; id: string }
+    description: { en: string; id: string }
+  }
 }
 
 export type Option = {

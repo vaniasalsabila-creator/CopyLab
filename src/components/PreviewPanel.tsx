@@ -1,5 +1,5 @@
 import { useStore } from '../store'
-import { WhatsAppPreview, PushPreview, SMSPreview } from './PreviewCard'
+import { WhatsAppPreview, PushPreview, SMSPreview, FlightAssistantPreview } from './PreviewCard'
 import { Button } from './ui'
 import { Icon } from './icons'
 
@@ -25,8 +25,10 @@ export function PreviewPanel() {
             <WhatsAppPreview copy={option.copy} lang={editorLang} />
           ) : channel === 'push' ? (
             <PushPreview copy={option.copy} lang={editorLang} />
-          ) : (
+          ) : channel === 'sms' ? (
             <SMSPreview copy={option.copy} lang={editorLang} />
+          ) : (
+            <FlightAssistantPreview copy={option.copy} lang={editorLang} />
           )
         ) : (
           <p className="text-sm text-ink-faint">Select an option to preview it here.</p>

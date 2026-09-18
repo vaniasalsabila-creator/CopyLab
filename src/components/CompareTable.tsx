@@ -16,6 +16,20 @@ const ROWS: Row[] = [
   { key: 'ps-id', label: 'Push Subtitle ID', max: LIMITS.pushSubtitle, get: (o) => o.copy.push.subtitle.id },
   { key: 'sms-en', label: 'SMS EN', max: LIMITS.sms, warnAt: LIMITS.smsWarn, get: (o) => o.copy.sms.en },
   { key: 'sms-id', label: 'SMS ID', max: LIMITS.sms, warnAt: LIMITS.smsWarn, get: (o) => o.copy.sms.id },
+  { key: 'fa-title-en', label: 'Flight Assistant Title EN', max: LIMITS.flightAssistantTitle, get: (o) => o.copy.flightAssistant.title.en },
+  { key: 'fa-title-id', label: 'Flight Assistant Title ID', max: LIMITS.flightAssistantTitle, get: (o) => o.copy.flightAssistant.title.id },
+  {
+    key: 'fa-desc-en',
+    label: 'Flight Assistant Description EN',
+    max: LIMITS.flightAssistantDescription,
+    get: (o) => o.copy.flightAssistant.description.en,
+  },
+  {
+    key: 'fa-desc-id',
+    label: 'Flight Assistant Description ID',
+    max: LIMITS.flightAssistantDescription,
+    get: (o) => o.copy.flightAssistant.description.id,
+  },
 ]
 
 export function CompareTable({ options }: { options: Option[] }) {

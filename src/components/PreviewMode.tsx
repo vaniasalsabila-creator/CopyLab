@@ -1,6 +1,6 @@
 import { useStore } from '../store'
 import { IconButton } from './ui'
-import { WhatsAppPreview, PushPreview, SMSPreview } from './PreviewCard'
+import { WhatsAppPreview, PushPreview, SMSPreview, FlightAssistantPreview } from './PreviewCard'
 import { CompareTable } from './CompareTable'
 
 export function PreviewMode() {
@@ -43,6 +43,7 @@ export function PreviewMode() {
               { id: 'whatsapp', label: 'WhatsApp' },
               { id: 'push', label: 'Push Notification' },
               { id: 'sms', label: 'SMS' },
+              { id: 'flightAssistant', label: 'Flight Assistant' },
             ]}
           />
           <SegmentedControl
@@ -96,8 +97,10 @@ export function PreviewMode() {
                   <WhatsAppPreview copy={o.copy} lang={previewLang} />
                 ) : previewChannel === 'push' ? (
                   <PushPreview copy={o.copy} lang={previewLang} />
-                ) : (
+                ) : previewChannel === 'sms' ? (
                   <SMSPreview copy={o.copy} lang={previewLang} />
+                ) : (
+                  <FlightAssistantPreview copy={o.copy} lang={previewLang} />
                 )}
               </div>
             ))}

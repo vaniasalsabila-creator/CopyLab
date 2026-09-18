@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { normalizeCopy } from './ids'
 import type { CopyFields, Folder, Option, Project, Variation } from '../types'
 
 type FolderRow = { id: string; user_id: string; name: string; created_at: number }
@@ -51,7 +52,7 @@ function variationToRow(v: Variation, userId: string): VariationRow {
 }
 
 function optionFromRow(r: OptionRow): Option {
-  return { id: r.id, variationId: r.variation_id, name: r.name, createdAt: r.created_at, copy: r.copy }
+  return { id: r.id, variationId: r.variation_id, name: r.name, createdAt: r.created_at, copy: normalizeCopy(r.copy) }
 }
 function optionToRow(o: Option, userId: string): OptionRow {
   return { id: o.id, user_id: userId, variation_id: o.variationId, name: o.name, created_at: o.createdAt, copy: o.copy }

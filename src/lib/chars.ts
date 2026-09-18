@@ -16,6 +16,8 @@ export const LIMITS = {
   pushSubtitle: 75,
   sms: 160,
   smsWarn: 145,
+  flightAssistantTitle: 80,
+  flightAssistantDescription: 100,
 } as const
 
 export type LimitTone = 'ok' | 'warn' | 'over'

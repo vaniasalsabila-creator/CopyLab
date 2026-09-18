@@ -195,6 +195,21 @@ button {
   animation: card-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes gradient-snake {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.animate-gradient-snake {
+  animation: gradient-snake 5s ease infinite;
+}
+
 @keyframes menu-in {
   from {
     opacity: 0;

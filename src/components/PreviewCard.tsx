@@ -5,6 +5,8 @@ import { FormattedText, InlineText } from './FormattedText'
 import { Icon } from './icons'
 import type { ReactNode } from 'react'
 
+const GRADIENT_BORDER = 'linear-gradient(115deg, #34d399, #38bdf8, #a78bfa, #34d399)'
+
 function LangBlock({ children, lang }: { children: ReactNode; lang?: Lang }) {
   return (
     <div className="space-y-1">
@@ -237,6 +239,85 @@ export function SMSPreview({ copy, lang }: { copy: CopyFields; lang: Lang | 'bot
         {langs.map((l) => (
           <LangBlock key={l} lang={lang === 'both' ? l : undefined}>
             <CounterLabel count={countChars(copy.sms[l])} max={LIMITS.sms} warnAt={LIMITS.smsWarn} />
+          </LangBlock>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function FlightAssistantCard({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="relative mx-auto w-full max-w-[300px]">
+      <div
+        className="animate-gradient-snake rounded-2xl p-[2px] shadow-md"
+        style={{ backgroundImage: GRADIENT_BORDER, backgroundSize: '300% 300%' }}
+      >
+        <div className="relative flex items-start gap-2.5 rounded-[14px] bg-white p-3 pr-2.5">
+          <button
+            type="button"
+            aria-label="Dismiss"
+            className="absolute right-2 top-2 text-[#9aa0a6] transition-colors hover:text-[#5f6368]"
+          >
+            <Icon name="close" size={14} />
+          </button>
+          <div className="min-w-0 flex-1 pr-4">
+            <div className="line-clamp-2 flex items-start gap-1 text-[13.5px] font-semibold leading-snug text-[#1a1a1a]">
+              {title ? <InlineText text={title} /> : <span className="italic font-normal text-[#9aa0a6]">No title yet</span>}
+            </div>
+            <div className="mt-1 line-clamp-3 text-[12px] leading-snug text-[#4b4b4d]">
+              {description ? (
+                <FormattedText text={description} className="!space-y-0" />
+              ) : (
+                <span className="italic text-[#9aa0a6]">No description yet</span>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="mt-4 shrink-0 self-center rounded-full bg-gradient-to-b from-[#4d8bf5] to-[#2f6fed] px-3.5 py-[7px] text-[12px] font-semibold text-white shadow-sm"
+          >
+            Select
+          </button>
+        </div>
+      </div>
+      <svg
+        className="absolute left-7 -bottom-[7px] drop-shadow-sm"
+        width="16"
+        height="8"
+        viewBox="0 0 16 8"
+        aria-hidden="true"
+      >
+        <path d="M0 0h16L8 8Z" fill="white" />
+      </svg>
+    </div>
+  )
+}
+
+export function FlightAssistantPreview({ copy, lang }: { copy: CopyFields; lang: Lang | 'both' }) {
+  const langs: Lang[] = lang === 'both' ? ['en', 'id'] : [lang]
+  return (
+    <div className="rounded-lg border border-line bg-surface-2 p-3">
+      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-ink-muted">
+        <Icon name="plane" size={13} />
+        Flight Assistant
+      </div>
+
+      <div className="mx-auto w-[360px] overflow-hidden rounded-xl bg-[#cdd2df] px-5 py-8">
+        {langs.map((l) => (
+          <div key={l} className={l !== langs[0] ? 'mt-4' : ''}>
+            <FlightAssistantCard title={copy.flightAssistant.title[l]} description={copy.flightAssistant.description[l]} />
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-2.5 space-y-2">
+        {langs.map((l) => (
+          <LangBlock key={l} lang={lang === 'both' ? l : undefined}>
+            <div className="space-y-0.5">
+              <CounterLabel count={countChars(copy.flightAssistant.title[l])} max={LIMITS.flightAssistantTitle} />
+              <CounterLabel count={countChars(copy.flightAssistant.description[l])} max={LIMITS.flightAssistantDescription} />
+            </div>
           </LangBlock>
         ))}
       </div>

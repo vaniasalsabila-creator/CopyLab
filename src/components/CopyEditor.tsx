@@ -9,6 +9,7 @@ const CHANNEL_TABS: { id: Channel; label: string }[] = [
   { id: 'whatsapp', label: 'WhatsApp Blast' },
   { id: 'push', label: 'Push Notification' },
   { id: 'sms', label: 'SMS' },
+  { id: 'flightAssistant', label: 'Flight Assistant' },
 ]
 
 const LANG_TABS: { id: 'en' | 'id' | 'both'; label: string }[] = [
@@ -128,7 +129,7 @@ export function CopyEditor() {
               </div>
             </div>
           </div>
-        ) : (
+        ) : channel === 'sms' ? (
           <div>
             <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">SMS</h3>
             <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
@@ -144,6 +145,51 @@ export function CopyEditor() {
                   minRows={4}
                 />
               ))}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div>
+              <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">Title</h3>
+              <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
+                {langs.map((lang) => (
+                  <CopyField
+                    key={lang}
+                    label={lang === 'en' ? 'English' : 'Indonesian'}
+                    value={option.copy.flightAssistant.title[lang]}
+                    onChange={(v) =>
+                      updateCopy(option.id, (c) => ({
+                        ...c,
+                        flightAssistant: { ...c.flightAssistant, title: { ...c.flightAssistant.title, [lang]: v } },
+                      }))
+                    }
+                    placeholder={lang === 'en' ? 'Best choice for you! ✨' : 'Pilihan terbaik untukmu! ✨'}
+                    max={LIMITS.flightAssistantTitle}
+                    minRows={2}
+                  />
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">Description</h3>
+              <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
+                {langs.map((lang) => (
+                  <CopyField
+                    key={lang}
+                    label={lang === 'en' ? 'English' : 'Indonesian'}
+                    value={option.copy.flightAssistant.description[lang]}
+                    onChange={(v) =>
+                      updateCopy(option.id, (c) => ({
+                        ...c,
+                        flightAssistant: { ...c.flightAssistant, description: { ...c.flightAssistant.description, [lang]: v } },
+                      }))
+                    }
+                    placeholder={lang === 'en' ? 'Enter your message' : 'Masukkan pesan Anda'}
+                    max={LIMITS.flightAssistantDescription}
+                    minRows={3}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         )}

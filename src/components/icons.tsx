@@ -49,6 +49,8 @@ export type IconName =
   | 'paragraph'
   | 'sms'
   | 'log-out'
+  | 'plane'
+  | 'sparkle'
 
 const paths: Record<IconName, ReactElement> = {
   search: (
@@ -322,6 +324,12 @@ const paths: Record<IconName, ReactElement> = {
       <path d="M16 17l5-5-5-5" />
       <path d="M21 12H9" />
     </>
+  ),
+  plane: (
+    <path d="M10.5 21l1.5-6.5L3 11l2-2 8 2 4.5-4.5c.8-.8 2.6-.8 3 0 .4.8-.2 2.2-1 3L15 14l2 8-2-2-2.5-4-2 2v2z" strokeLinejoin="round" />
+  ),
+  sparkle: (
+    <path d="M12 3l1.6 4.9L18.5 9.5 13.6 11.1 12 16l-1.6-4.9L5.5 9.5l4.9-1.6L12 3Z" strokeLinejoin="round" />
   ),
 }
 
