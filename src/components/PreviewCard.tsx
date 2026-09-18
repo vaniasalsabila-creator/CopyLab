@@ -254,34 +254,34 @@ function FlightAssistantCard({ title, description }: { title: string; descriptio
         style={{ backgroundImage: GRADIENT_BORDER, backgroundSize: '300% 300%' }}
       >
         <div
-          className="relative flex items-start gap-3 rounded-[18px] py-3 pl-3.5 pr-3"
+          className="relative rounded-[18px] p-4"
           style={{ backgroundImage: 'linear-gradient(135deg, #ffffff 0%, #fbfaff 55%, #f4f1fd 100%)' }}
         >
           <button
             type="button"
             aria-label="Dismiss"
-            className="absolute right-3 top-3 flex h-4 w-4 items-center justify-center text-[#8b8f97] transition-colors hover:text-[#4b4d54]"
+            className="absolute right-4 top-4 flex h-4 w-4 items-center justify-center text-[#8b8f97] transition-colors hover:text-[#4b4d54]"
           >
             <Icon name="close" size={14} className="stroke-[2.25]" />
           </button>
-          <div className="min-w-0 flex-1">
-            <div className="line-clamp-2 flex items-start gap-1 pr-4 text-[14px] font-bold leading-snug text-[#17181a]">
-              {title ? <InlineText text={title} /> : <span className="italic font-normal text-[#9aa0a6]">No title yet</span>}
-            </div>
-            <div className="mt-1 line-clamp-3 text-[12px] leading-[1.4] text-[#3c3d40]">
+          <div className="line-clamp-2 flex items-start gap-1 pr-7 text-[15px] font-bold leading-snug text-[#17181a]">
+            {title ? <InlineText text={title} /> : <span className="italic font-normal text-[#9aa0a6]">No title yet</span>}
+          </div>
+          <div className="mt-2 flex items-end gap-3">
+            <div className="line-clamp-3 min-w-0 flex-1 text-[12.5px] leading-[1.4] text-[#3c3d40]">
               {description ? (
                 <FormattedText text={description} className="!space-y-0 [&_strong]:font-bold [&_strong]:text-[#17181a]" />
               ) : (
                 <span className="italic text-[#9aa0a6]">No description yet</span>
               )}
             </div>
+            <button
+              type="button"
+              className="shrink-0 rounded-full bg-gradient-to-br from-[#5b93f7] to-[#2f6fed] px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_4px_10px_-2px_rgba(47,111,237,0.55)]"
+            >
+              Select
+            </button>
           </div>
-          <button
-            type="button"
-            className="mt-6 shrink-0 rounded-full bg-gradient-to-br from-[#5b93f7] to-[#2f6fed] px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_4px_10px_-2px_rgba(47,111,237,0.55)]"
-          >
-            Select
-          </button>
         </div>
       </div>
       <svg
