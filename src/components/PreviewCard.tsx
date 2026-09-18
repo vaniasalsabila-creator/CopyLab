@@ -248,26 +248,29 @@ export function SMSPreview({ copy, lang }: { copy: CopyFields; lang: Lang | 'bot
 
 function FlightAssistantCard({ title, description }: { title: string; description: string }) {
   return (
-    <div className="relative mx-auto w-full max-w-[300px]">
+    <div className="relative mx-auto w-full max-w-[336px]">
       <div
-        className="animate-gradient-snake rounded-2xl p-[2px] shadow-md"
+        className="animate-gradient-snake rounded-[20px] p-[2px] shadow-[0_8px_20px_-8px_rgba(30,30,40,0.35)]"
         style={{ backgroundImage: GRADIENT_BORDER, backgroundSize: '300% 300%' }}
       >
-        <div className="relative flex items-start gap-2.5 rounded-[14px] bg-white p-3 pr-2.5">
+        <div
+          className="relative flex items-start gap-3 rounded-[18px] py-3 pl-3.5 pr-3"
+          style={{ backgroundImage: 'linear-gradient(135deg, #ffffff 0%, #fbfaff 55%, #f4f1fd 100%)' }}
+        >
           <button
             type="button"
             aria-label="Dismiss"
-            className="absolute right-2 top-2 text-[#9aa0a6] transition-colors hover:text-[#5f6368]"
+            className="absolute right-3 top-3 flex h-4 w-4 items-center justify-center text-[#8b8f97] transition-colors hover:text-[#4b4d54]"
           >
-            <Icon name="close" size={14} />
+            <Icon name="close" size={14} className="stroke-[2.25]" />
           </button>
-          <div className="min-w-0 flex-1 pr-4">
-            <div className="line-clamp-2 flex items-start gap-1 text-[13.5px] font-semibold leading-snug text-[#1a1a1a]">
+          <div className="min-w-0 flex-1">
+            <div className="line-clamp-2 flex items-start gap-1 pr-4 text-[14px] font-bold leading-snug text-[#17181a]">
               {title ? <InlineText text={title} /> : <span className="italic font-normal text-[#9aa0a6]">No title yet</span>}
             </div>
-            <div className="mt-1 line-clamp-3 text-[12px] leading-snug text-[#4b4b4d]">
+            <div className="mt-1 line-clamp-3 text-[12px] leading-[1.4] text-[#3c3d40]">
               {description ? (
-                <FormattedText text={description} className="!space-y-0" />
+                <FormattedText text={description} className="!space-y-0 [&_strong]:font-bold [&_strong]:text-[#17181a]" />
               ) : (
                 <span className="italic text-[#9aa0a6]">No description yet</span>
               )}
@@ -275,20 +278,20 @@ function FlightAssistantCard({ title, description }: { title: string; descriptio
           </div>
           <button
             type="button"
-            className="mt-4 shrink-0 self-center rounded-full bg-gradient-to-b from-[#4d8bf5] to-[#2f6fed] px-3.5 py-[7px] text-[12px] font-semibold text-white shadow-sm"
+            className="mt-6 shrink-0 rounded-full bg-gradient-to-br from-[#5b93f7] to-[#2f6fed] px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_4px_10px_-2px_rgba(47,111,237,0.55)]"
           >
             Select
           </button>
         </div>
       </div>
       <svg
-        className="absolute left-7 -bottom-[7px] drop-shadow-sm"
+        className="absolute -bottom-[8px] right-12 drop-shadow-sm"
         width="16"
         height="8"
         viewBox="0 0 16 8"
         aria-hidden="true"
       >
-        <path d="M0 0h16L8 8Z" fill="white" />
+        <path d="M0 0h16L9 8Z" fill="#fbfaff" />
       </svg>
     </div>
   )
@@ -303,7 +306,7 @@ export function FlightAssistantPreview({ copy, lang }: { copy: CopyFields; lang:
         Flight Assistant
       </div>
 
-      <div className="mx-auto w-[360px] overflow-hidden rounded-xl bg-[#cdd2df] px-5 py-8">
+      <div className="mx-auto w-[360px] overflow-hidden rounded-xl bg-[#d7dae4] px-3 py-5">
         {langs.map((l) => (
           <div key={l} className={l !== langs[0] ? 'mt-4' : ''}>
             <FlightAssistantCard title={copy.flightAssistant.title[l]} description={copy.flightAssistant.description[l]} />
