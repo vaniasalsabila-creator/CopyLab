@@ -1,3 +1,4 @@
+import { DEFAULT_CHANNEL } from './lib/channels'
 import { create } from 'zustand'
 import { cloneCopy, emptyCopy, uid } from './lib/ids'
 import { db, claimNewUser, fetchWorkspace, type WorkspaceSettings } from './lib/db'
@@ -183,12 +184,12 @@ export const useStore = create<Store>()((set, get) => ({
 
   sidebarNav: 'all',
   search: '',
-  channel: 'whatsapp',
+  channel: DEFAULT_CHANNEL,
   editorLang: 'both',
 
   previewOpen: false,
   previewOptionIds: [],
-  previewChannel: 'whatsapp',
+  previewChannel: DEFAULT_CHANNEL,
   previewLang: 'en',
   previewView: 'preview',
   whatsappVariant: 'text',

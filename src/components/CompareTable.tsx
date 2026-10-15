@@ -3,11 +3,12 @@ import { useStore } from '../store'
 import { countChars, formatCount, limitTone } from '../lib/chars'
 import { LIMITS } from '../lib/chars'
 import { Icon } from './icons'
+import { isChannelEnabled } from '../lib/channels'
 import type { Option } from '../types'
 
 type Row = { key: string; label: string; max: number; warnAt?: number; get: (o: Option) => string }
 
-const ROWS: Row[] = [
+const ALL_ROWS: Row[] = [
   { key: 'wa-en', label: 'WhatsApp EN', max: LIMITS.whatsapp, warnAt: LIMITS.whatsappWarn, get: (o) => o.copy.whatsapp.en },
   { key: 'wa-id', label: 'WhatsApp ID', max: LIMITS.whatsapp, warnAt: LIMITS.whatsappWarn, get: (o) => o.copy.whatsapp.id },
   { key: 'pt-en', label: 'Push Title EN', max: LIMITS.pushTitle, get: (o) => o.copy.push.title.en },
@@ -31,6 +32,8 @@ const ROWS: Row[] = [
     get: (o) => o.copy.flightAssistant.description.id,
   },
 ]
+
+const ROWS = ALL_ROWS.filter((r) => !r.key.startsWith('fa-') || isChannelEnabled('flightAssistant'))
 
 export function CompareTable({ options }: { options: Option[] }) {
   return (

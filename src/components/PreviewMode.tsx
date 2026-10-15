@@ -1,4 +1,5 @@
 import { useStore } from '../store'
+import { ENABLED_CHANNELS } from '../lib/channels'
 import { IconButton } from './ui'
 import { WhatsAppPreview, PushPreview, SMSPreview, FlightAssistantPreview } from './PreviewCard'
 import { CompareTable } from './CompareTable'
@@ -39,12 +40,7 @@ export function PreviewMode() {
             label="Channel"
             value={previewChannel}
             onChange={(v) => setPreviewChannel(v as typeof previewChannel)}
-            options={[
-              { id: 'whatsapp', label: 'WhatsApp' },
-              { id: 'push', label: 'Push Notification' },
-              { id: 'sms', label: 'SMS' },
-              { id: 'flightAssistant', label: 'Flight Assistant' },
-            ]}
+            options={ENABLED_CHANNELS.map((c) => ({ id: c.id, label: c.previewLabel }))}
           />
           <SegmentedControl
             label="Language"

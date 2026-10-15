@@ -1,12 +1,5 @@
 import { useStore } from '../store'
-import type { Channel } from '../types'
-
-const CHANNEL_TABS: { id: Channel; label: string }[] = [
-  { id: 'whatsapp', label: 'WhatsApp Blast' },
-  { id: 'push', label: 'Push Notification' },
-  { id: 'sms', label: 'SMS' },
-  { id: 'flightAssistant', label: 'Flight Assistant' },
-]
+import { ENABLED_CHANNELS } from '../lib/channels'
 
 export function ChannelTabs() {
   const channel = useStore((s) => s.channel)
@@ -22,7 +15,7 @@ export function ChannelTabs() {
         </div>
       </div>
       <div className="flex flex-wrap rounded-lg bg-surface-3 p-0.5">
-        {CHANNEL_TABS.map((tab) => (
+        {ENABLED_CHANNELS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setChannel(tab.id)}
