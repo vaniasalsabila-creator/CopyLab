@@ -3,7 +3,7 @@ import { countChars, LIMITS } from '../lib/chars'
 import { CounterLabel } from './CharField'
 import { FormattedText, InlineText } from './FormattedText'
 import { Icon } from './icons'
-import type { ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 const GRADIENT_BORDER = 'linear-gradient(115deg, #34d399, #38bdf8, #a78bfa, #34d399)'
 
@@ -22,18 +22,10 @@ const WA_WALLPAPER =
   'radial-gradient(circle at 8px 8px, rgba(0,0,0,0.045) 1.4px, transparent 1.5px),' +
   'radial-gradient(circle at 22px 26px, rgba(0,0,0,0.035) 1px, transparent 1.1px)'
 
-function ChatBubbleTail() {
-  return (
-    <svg width="8" height="13" viewBox="0 0 8 13" className="absolute -left-2 top-0 text-white" aria-hidden="true">
-      <path fill="currentColor" d="M8 0C8 0 4.5 0.2 4 3C3.6 5.3 6 9 0 13H8V0Z" />
-    </svg>
-  )
-}
-
 function ChatBubble({ text }: { text: string }) {
   return (
-    <div className="relative ml-1.5 max-w-full rounded-lg rounded-tl-none bg-white px-2.5 py-[7px] text-[13px] leading-relaxed text-[#111b21] shadow-[0_1px_0.5px_rgba(0,0,0,0.13)]">
-      <ChatBubbleTail />
+    <div className="relative ml-1.5 mr-6 max-w-full rounded-[18px] rounded-bl-none bg-white px-3.5 pb-1.5 pt-2.5 text-[13.5px] leading-[1.4] text-[#111b21]">
+      <IosChatBubbleTail />
       {text ? (
         <FormattedText text={text} />
       ) : (
@@ -44,51 +36,366 @@ function ChatBubble({ text }: { text: string }) {
   )
 }
 
-export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang | 'both' }) {
-  const langs: Lang[] = lang === 'both' ? ['en', 'id'] : [lang]
+/** Banners are authored at 2:1. In the chat list WhatsApp crops them to the bubble (~1.7:1); opened, they show in full. */
+const BANNER_CHAT_ASPECT = 'aspect-[700/410]'
+const BANNER_FULL_ASPECT = 'aspect-[2/1]'
+
+function BannerPlaceholder({ src, aspect = BANNER_CHAT_ASPECT }: { src?: string; aspect?: string }) {
+  if (src) return <img src={src} alt="" className={`block w-full object-cover ${aspect}`} />
   return (
+    <div className={`flex w-full ${aspect} items-center justify-center bg-gradient-to-br from-[#fbd3e3] via-[#f7b6d2] to-[#e58fb8] text-[11px] font-medium text-white/90`}>
+      Banner image
+    </div>
+  )
+}
+
+const WA_BRAND = '#00a884'
+
+function IosChatBubbleTail() {
+  return (
+    <svg width="9" height="14" viewBox="0 0 9 14" className="absolute -left-[8px] bottom-0 text-white" aria-hidden="true">
+      <path fill="currentColor" d="M9 0V14H0C5.5 13.4 8.6 9 9 0Z" />
+    </svg>
+  )
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="3" />
+      <path d="M9 15 15 9M10 9h5v5" />
+    </svg>
+  )
+}
+
+/** Native-style WhatsApp card: banner on top, body text, "Read more", then a CTA row. */
+function RichChatBubble({
+  text,
+  cta,
+  banner,
+  show,
+  onOpen,
+  carousel = false,
+  tail = true,
+}: {
+  text: string
+  cta: string
+  banner: string
+  show: CopyFields['whatsappShow']
+  onOpen: () => void
+  /** Fixed-width card inside a sideways-scrolling carousel row. */
+  carousel?: boolean
+  tail?: boolean
+}) {
+  return (
+    <div
+      className={`relative flex flex-col rounded-[18px] bg-white text-[#111b21] ${tail ? 'rounded-bl-none' : ''} ${
+        carousel ? 'w-[calc(100%-68px)] shrink-0 snap-start' : 'mr-6 max-w-full'
+      }`}
+    >
+      {tail && <IosChatBubbleTail />}
+      {show.banner && (
+        <button type="button" onClick={onOpen} className="block w-full cursor-pointer overflow-hidden rounded-t-[18px]">
+          <BannerPlaceholder src={banner} />
+        </button>
+      )}
+      <div className="flex flex-1 flex-col px-3.5 pb-3 pt-2.5 text-[13.5px] leading-[1.4]">
+        {text ? (
+          <div className="line-clamp-3">
+            <FormattedText text={text} />
+          </div>
+        ) : (
+          <span className="italic text-[#8696a0]">No copy written yet.</span>
+        )}
+        <button type="button" onClick={onOpen} className="mt-auto block self-start pt-3 text-[13.5px]" style={{ color: WA_BRAND }}>
+          Read more
+        </button>
+      </div>
+      {show.cta && (
+        <div
+          className="flex items-center justify-center gap-2 border-t border-[#e4e4e4] py-2.5 text-[13.5px]"
+          style={{ color: WA_BRAND }}
+        >
+          <ExternalLinkIcon />
+          {cta ? <InlineText text={cta} /> : <span className="italic text-[#8696a0]">No CTA yet</span>}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function IntroBubble({ text }: { text: string }) {
+  return (
+    <div className="mr-6 max-w-full rounded-[18px] bg-white px-3.5 pb-1.5 pt-2.5 text-[13.5px] leading-[1.4] text-[#111b21]">
+      {text ? <FormattedText text={text} /> : <span className="italic text-[#8696a0]">No intro written yet.</span>}
+      <div className="text-right text-[10.5px] text-[#667781]">6.35 PM</div>
+    </div>
+  )
+}
+
+function ThumbIcon({ down }: { down?: boolean }) {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className={down ? 'rotate-180' : ''} aria-hidden="true">
+      <path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3Zm0 0 4-8a2.5 2.5 0 0 1 2.5 2.5V9h5.3a2 2 0 0 1 2 2.3l-1.2 7a2 2 0 0 1-2 1.7H7" />
+    </svg>
+  )
+}
+
+/** What opens when the card is tapped: full 2:1 banner, full text, and the CTA as a green button. */
+function MessageDetail({
+  text,
+  cta,
+  banner,
+  show,
+  onClose,
+}: {
+  text: string
+  cta: string
+  banner: string
+  show: CopyFields['whatsappShow']
+  onClose: () => void
+}) {
+  return (
+    <div className="absolute inset-0 z-10 flex flex-col bg-white">
+      <div className="flex items-center gap-2 border-b border-[#eeeeee] px-3 py-2.5">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Back"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-[#e4e4e4] text-[#111b21]"
+        >
+          <Icon name="chevron-left" size={15} />
+        </button>
+        <div className="flex-1 text-center leading-tight">
+          <div className="text-[14px] font-medium text-[#111b21]">tiket.com promo</div>
+          <div className="text-[10.5px] text-[#54656f]">12/12/25, 6.35 PM</div>
+        </div>
+        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#e4e4e4] text-[#111b21]">
+          <Icon name="more" size={15} />
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        {show.banner && (
+          <div className="mt-6">
+            <BannerPlaceholder src={banner} aspect={BANNER_FULL_ASPECT} />
+          </div>
+        )}
+        <div className={`mx-3 border-t ${show.banner ? 'mt-6' : 'mt-3'} border-[#eeeeee] pt-4 text-[13.5px] leading-[1.45] text-[#111b21]`}>
+          {text ? <FormattedText text={text} /> : <span className="italic text-[#8696a0]">No copy written yet.</span>}
+        </div>
+        {show.cta && (
+          <div className="flex justify-end px-3 pb-3 pt-4">
+            <div className="flex items-center gap-2 rounded-full bg-[#00a884] px-4 py-2 text-[13.5px] font-medium text-white">
+              <ExternalLinkIcon />
+              {cta ? <InlineText text={cta} /> : <span className="italic font-normal text-white/70">No CTA yet</span>}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+type PhoneWidth = 360 | 412
+const PHONE_WIDTHS: PhoneWidth[] = [360, 412]
+
+/** Lays the frame out at its real phone width, then scales it down to fit when the panel is narrower. */
+function PhoneViewport({ width, children }: { width: PhoneWidth; children: ReactNode }) {
+  const outer = useRef<HTMLDivElement>(null)
+  const inner = useRef<HTMLDivElement>(null)
+  const [fit, setFit] = useState({ scale: 1, height: 0 })
+
+  useEffect(() => {
+    const o = outer.current
+    const i = inner.current
+    if (!o || !i) return
+    const measure = () => {
+      const scale = Math.min(1, o.clientWidth / width)
+      setFit({ scale, height: i.offsetHeight * scale })
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(o)
+    ro.observe(i)
+    return () => ro.disconnect()
+  }, [width])
+
+  return (
+    <div ref={outer} className="mx-auto w-full" style={{ maxWidth: width, height: fit.height || undefined }}>
+      <div ref={inner} style={{ width, transform: `scale(${fit.scale})`, transformOrigin: 'top left' }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function IosWhatsAppFrame({ children, detail, reactions = true }: { children: ReactNode; detail?: ReactNode; reactions?: boolean }) {
+  return (
+    <div className="relative w-full overflow-hidden rounded-xl bg-[#f0ece6] shadow-sm">
+      {detail}
+      <div className="flex items-center gap-2 bg-[#f6f3ee] px-3 py-2.5">
+        <div className="flex h-8 items-center gap-0.5 rounded-full bg-white/80 pl-1.5 pr-2.5 text-[12px] font-medium text-[#111b21] shadow-sm">
+          <Icon name="chevron-left" size={14} />
+          174
+        </div>
+        <img src={APP_ICON_SRC} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />
+        <div className="flex min-w-0 flex-1 items-center gap-1 text-[14px] font-semibold text-[#111b21]">
+          <span className="truncate">tiket.com promo</span>
+          <Icon name="badge-check" size={13} className="shrink-0 text-[#1d9bf0]" />
+        </div>
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[#111b21] shadow-sm">
+          <Icon name="more" size={16} />
+        </div>
+      </div>
+
+      <div className="space-y-3 px-3 pb-3 pt-4" style={{ backgroundImage: WA_WALLPAPER, backgroundSize: '30px 34px' }}>
+        <div className="flex justify-center">
+          <span className="rounded-full bg-white px-3 py-1 text-[11px] font-medium text-[#111b21]">12 Dec 2025</span>
+        </div>
+        {children}
+        <div className={`gap-2 ${reactions ? 'flex' : 'hidden'}`}>
+          {[false, true].map((down) => (
+            <div key={String(down)} className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#54656f]">
+              <ThumbIcon down={down} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 px-3 pb-3 pt-1">
+        <Icon name="plus" size={20} className="shrink-0 text-[#111b21]" />
+        <div className="flex h-8 flex-1 items-center justify-end rounded-full border border-[#d9d5cf] bg-white px-2.5 text-[#54656f]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true">
+            <path d="M20 12a8 8 0 1 0-8 8c4.5 0 8-3.5 8-8Z" />
+            <path d="M20 12c-4.5 0-8 0-8 8" />
+          </svg>
+        </div>
+        <Icon name="camera" size={20} className="shrink-0 text-[#111b21]" />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white" style={{ backgroundColor: WA_BRAND }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="9" y="2" width="6" height="12" rx="3" />
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang | 'both' }) {
+  const [variant, setVariant] = useState<1 | 2>(1)
+  const [phoneWidth, setPhoneWidth] = useState<PhoneWidth>(360)
+  const [open, setOpen] = useState<{ lang: Lang; index: number } | null>(null)
+  const langs: Lang[] = lang === 'both' ? ['en', 'id'] : [lang]
+  const cardsFor = (l: Lang) => [
+    { text: copy.whatsapp[l], cta: copy.whatsappCta[l], banner: copy.whatsappBanner[l] },
+    ...(copy.whatsappShow.carousel
+      ? copy.whatsappCards.map((c) => ({ text: c.text[l], cta: c.cta[l], banner: c.banner[l] }))
+      : []),
+  ]
+  const openCard = open && langs.includes(open.lang) ? cardsFor(open.lang)[open.index] : undefined
+  return (
+    <div className="space-y-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <div className="flex rounded-md bg-surface-3 p-0.5">
+          {([1, 2] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setVariant(v)}
+              className={`rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                variant === v ? 'bg-surface text-ink shadow-sm' : 'text-ink-muted hover:text-ink'
+              }`}
+            >
+              {v === 1 ? 'Text' : 'Text + Image'}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+          <div className="flex rounded-md bg-surface-3 p-0.5">
+            {PHONE_WIDTHS.map((w) => (
+              <button
+                key={w}
+                type="button"
+                onClick={() => setPhoneWidth(w)}
+                className={`rounded px-2.5 py-1 font-medium transition-colors ${
+                  phoneWidth === w ? 'bg-surface text-ink shadow-sm' : 'text-ink-muted hover:text-ink'
+                }`}
+              >
+                {w}px
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
     <div className="rounded-lg border border-line bg-surface-2 p-3">
       <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-ink-muted">
         <Icon name="whatsapp" size={13} className="text-[#25d366]" />
         WhatsApp Blast
       </div>
 
-      <div className="mx-auto w-[360px] overflow-hidden rounded-xl shadow-sm">
-        <div className="flex items-center gap-2 bg-[#075E54] px-3 py-2.5 text-white">
-          <img src={APP_ICON_SRC} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1 text-[13px] font-medium leading-tight">
-              <span className="truncate">tiket.com</span>
-              <Icon name="badge-check" size={12} className="shrink-0 text-[#53bdeb]" />
-            </div>
-            <div className="text-[10.5px] leading-tight text-white/70">Business Account</div>
-          </div>
-          <div className="flex shrink-0 items-center gap-3 text-white/80">
-            <Icon name="video" size={16} />
-            <Icon name="phone" size={14} />
-          </div>
-        </div>
-
-        <div
-          className="space-y-3 px-3 py-4"
-          style={{ backgroundColor: '#e9ded2', backgroundImage: WA_WALLPAPER, backgroundSize: '30px 34px' }}
-        >
-          <div className="flex justify-center">
-            <span className="rounded-md bg-white/70 px-2.5 py-1 text-[10.5px] font-medium text-[#54656f] shadow-sm">Today</span>
-          </div>
+      <PhoneViewport width={phoneWidth}>
+      {variant === 1 ? (
+        <IosWhatsAppFrame reactions={false}>
           {langs.map((l) => (
             <ChatBubble key={l} text={copy.whatsapp[l]} />
           ))}
-        </div>
-      </div>
+        </IosWhatsAppFrame>
+      ) : (
+        <IosWhatsAppFrame
+          detail={
+            openCard ? (
+              <MessageDetail
+                text={openCard.text}
+                cta={openCard.cta}
+                banner={openCard.banner}
+                show={copy.whatsappShow}
+                onClose={() => setOpen(null)}
+              />
+            ) : undefined
+          }
+        >
+          {langs.map((l) => {
+            const cards = cardsFor(l)
+            return (
+              <div key={l} className="space-y-1.5">
+                {copy.whatsappShow.intro && <IntroBubble text={copy.whatsappIntro[l]} />}
+                {cards.length > 1 ? (
+                  <div className="-mx-3 flex snap-x scroll-pl-3 items-stretch gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none]">
+                    {cards.map((c, i) => (
+                      <RichChatBubble
+                        key={i}
+                        {...c}
+                        show={copy.whatsappShow}
+                        carousel
+                        tail={i === 0}
+                        onOpen={() => setOpen({ lang: l, index: i })}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <RichChatBubble {...cards[0]} show={copy.whatsappShow} onOpen={() => setOpen({ lang: l, index: 0 })} />
+                )}
+              </div>
+            )
+          })}
+        </IosWhatsAppFrame>
+      )}
+      </PhoneViewport>
 
       <div className="mt-2.5 space-y-2">
         {langs.map((l) => (
           <LangBlock key={l} lang={lang === 'both' ? l : undefined}>
             <CounterLabel count={countChars(copy.whatsapp[l])} max={LIMITS.whatsapp} warnAt={LIMITS.whatsappWarn} />
+            {variant === 2 && copy.whatsappShow.intro && (
+              <CounterLabel count={countChars(copy.whatsappIntro[l])} max={LIMITS.whatsapp} warnAt={LIMITS.whatsappWarn} />
+            )}
+            {variant === 2 && copy.whatsappShow.cta && <CounterLabel count={countChars(copy.whatsappCta[l])} max={LIMITS.whatsappCta} />}
           </LangBlock>
         ))}
       </div>
+    </div>
     </div>
   )
 }

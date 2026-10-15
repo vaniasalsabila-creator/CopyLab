@@ -29,8 +29,24 @@ export type Variation = {
   createdAt: number
 }
 
+export type WhatsAppCard = {
+  id: string
+  text: { en: string; id: string }
+  cta: { en: string; id: string }
+  banner: { en: string; id: string }
+}
+
 export type CopyFields = {
   whatsapp: { en: string; id: string }
+  /** Optional text bubble shown above the card. */
+  whatsappIntro: { en: string; id: string }
+  whatsappCta: { en: string; id: string }
+  /** Which optional parts of the WhatsApp message are switched on. */
+  whatsappShow: { intro: boolean; banner: boolean; cta: boolean; carousel: boolean }
+  /** Extra carousel cards beside the main one (shown only when whatsappShow.carousel is on). */
+  whatsappCards: WhatsAppCard[]
+  /** Banner image per language, as compressed data URLs. */
+  whatsappBanner: { en: string; id: string }
   push: {
     title: { en: string; id: string }
     subtitle: { en: string; id: string }

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { Icon } from './icons'
 import { OverflowMenu } from './ui'
@@ -11,50 +12,103 @@ export function VariationTabs() {
   const setModal = useStore((s) => s.setModal)
   const duplicateVariation = useStore((s) => s.duplicateVariation)
 
+  const current = variations.find((v) => v.id === selectedVariationId)
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
   return (
-    <div className="flex items-center gap-1 overflow-x-auto scrollbar-none border-b border-line px-6 pt-3">
-      {variations.map((v) => {
-        const active = v.id === selectedVariationId
-        return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3">
+      <div className="flex w-44 shrink-0 items-center gap-2.5">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-btn text-[12px] font-semibold text-btn-fg shadow-sm">1</span>
+        <div className="leading-tight">
+          <div className="text-[13px] font-semibold text-ink">Variation</div>
+          <div className="text-[11px] text-ink-faint">Version to test</div>
+        </div>
+      </div>
+
+      <div ref={wrapRef} className="relative min-w-0">
+        <button
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+          className="flex h-9 min-w-[220px] max-w-[320px] items-center justify-between gap-2 rounded-lg border border-line bg-surface px-3 text-[13px] font-medium text-ink shadow-sm shadow-black/[0.03] transition-all hover:border-line-strong focus-visible:outline-2 focus-visible:outline-accent/30"
+        >
+          <span className="truncate">{current?.name ?? 'Select variation'}</span>
+          <Icon name="chevron-down" size={14} className={`shrink-0 text-ink-faint transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+
+        {open && (
           <div
-            key={v.id}
-            className={`group flex shrink-0 items-center gap-1 rounded-t-lg border-b-2 px-3 py-2 text-[13px] font-medium transition-colors ${
-              active ? 'border-accent text-ink' : 'border-transparent text-ink-muted hover:text-ink'
-            }`}
+            role="listbox"
+            className="absolute left-0 top-full z-[60] mt-1 max-h-72 min-w-full overflow-y-auto rounded-lg border border-line bg-surface py-1 shadow-lg shadow-black/10"
           >
-            <button onClick={() => selectVariation(v.id)} className="max-w-[180px] truncate">
-              {v.name}
+            {variations.map((v) => (
+              <button
+                key={v.id}
+                role="option"
+                aria-selected={v.id === selectedVariationId}
+                onClick={() => {
+                  selectVariation(v.id)
+                  setOpen(false)
+                }}
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[13px] text-ink transition-colors hover:bg-surface-3"
+              >
+                <span className="w-3.5 shrink-0">{v.id === selectedVariationId && <Icon name="check" size={14} />}</span>
+                <span className="truncate">{v.name}</span>
+              </button>
+            ))}
+            <div className="my-1 border-t border-line" />
+            <button
+              onClick={() => {
+                setOpen(false)
+                setModal({ type: 'variation-create' })
+              }}
+              className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[13px] text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink"
+            >
+              <Icon name="plus" size={14} />
+              Add Variation
             </button>
-            <div className={`transition-opacity ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-              <OverflowMenu
-                items={[
-                  { label: 'Rename', icon: 'pencil', onClick: () => setModal({ type: 'variation-rename', variationId: v.id }) },
-                  { label: 'Duplicate', icon: 'copy', onClick: () => duplicateVariation(v.id) },
-                  {
-                    label: 'Delete',
-                    icon: 'trash',
-                    danger: true,
-                    onClick: () =>
-                      setModal({
-                        type: 'confirm-delete',
-                        title: 'Delete variation?',
-                        body: `"${v.name}" and all of its options will be permanently deleted.`,
-                        onConfirm: () => useStore.getState().deleteVariation(v.id),
-                      }),
-                  },
-                ]}
-              />
-            </div>
           </div>
-        )
-      })}
-      <button
-        onClick={() => setModal({ type: 'variation-create' })}
-        className="mb-0.5 flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink"
-      >
-        <Icon name="plus" size={14} />
-        Add Variation
-      </button>
+        )}
+      </div>
+
+      {current && (
+        <OverflowMenu
+          items={[
+            { label: 'Rename', icon: 'pencil', onClick: () => setModal({ type: 'variation-rename', variationId: current.id }) },
+            { label: 'Duplicate', icon: 'copy', onClick: () => duplicateVariation(current.id) },
+            {
+              label: 'Delete',
+              icon: 'trash',
+              danger: true,
+              onClick: () =>
+                setModal({
+                  type: 'confirm-delete',
+                  title: 'Delete variation?',
+                  body: `"${current.name}" and all of its options will be permanently deleted.`,
+                  onConfirm: () => useStore.getState().deleteVariation(current.id),
+                }),
+            },
+          ]}
+        />
+      )}
     </div>
   )
 }

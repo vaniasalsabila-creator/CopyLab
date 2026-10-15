@@ -12,6 +12,7 @@ export function countChars(text: string): number {
 export const LIMITS = {
   whatsapp: 1024,
   whatsappWarn: 950,
+  whatsappCta: 25,
   pushTitle: 50,
   pushSubtitle: 75,
   sms: 160,

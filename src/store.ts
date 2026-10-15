@@ -249,7 +249,7 @@ export const useStore = create<Store>()((set, get) => ({
       options,
       favorites: settings.favorites,
       recent: settings.recent,
-      sidebarCollapsed: settings.sidebarCollapsed,
+      sidebarCollapsed: false,
       theme: settings.theme,
       selectedFolderId: firstProject?.folderId ?? firstFolder?.id ?? null,
       selectedProjectId: firstProject?.id ?? null,

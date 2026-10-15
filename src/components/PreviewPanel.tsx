@@ -1,7 +1,6 @@
 import { useStore } from '../store'
 import { WhatsAppPreview, PushPreview, SMSPreview, FlightAssistantPreview } from './PreviewCard'
 import { Button } from './ui'
-import { Icon } from './icons'
 
 export function PreviewPanel() {
   const option = useStore((s) => s.options.find((o) => o.id === s.selectedOptionId))
@@ -17,7 +16,11 @@ export function PreviewPanel() {
           <h2 className="text-[13px] font-semibold text-ink">Live Preview</h2>
           <p className="text-xs text-ink-faint">How this option looks right now</p>
         </div>
-        <Icon name="eye" size={16} className="text-ink-faint" />
+        {optionCount > 0 && (
+          <Button variant="secondary" size="sm" icon="eye" onClick={() => openPreview()}>
+            Preview Options
+          </Button>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto px-6 py-5">
         {option ? (
@@ -34,13 +37,6 @@ export function PreviewPanel() {
           <p className="text-sm text-ink-faint">Select an option to preview it here.</p>
         )}
       </div>
-      {optionCount > 1 && (
-        <div className="border-t border-line px-6 py-4">
-          <Button variant="secondary" size="sm" icon="grid" className="w-full" onClick={() => openPreview()}>
-            Compare all {optionCount} options
-          </Button>
-        </div>
-      )}
     </aside>
   )
 }

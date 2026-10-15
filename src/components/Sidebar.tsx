@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { useStore } from '../store'
 import { useAuthStore } from '../authStore'
 import { Icon, Logo } from './icons'
@@ -49,19 +49,36 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
   const projects = useStore((s) => s.projects)
   const selectedFolderId = useStore((s) => s.selectedFolderId)
   const selectFolder = useStore((s) => s.selectFolder)
+  const selectedProjectId = useStore((s) => s.selectedProjectId)
+  const selectProject = useStore((s) => s.selectProject)
   const setModal = useStore((s) => s.setModal)
   const deleteFolder = useStore((s) => s.deleteFolder)
   const email = useAuthStore((s) => s.session?.user.email)
   const signOut = useAuthStore((s) => s.signOut)
 
-  const q = search.trim().toLowerCase()
-  const visibleFolders = useMemo(() => {
-    if (!q) return folders
-    return folders.filter((f) => {
-      if (f.name.toLowerCase().includes(q)) return true
-      return projects.some((p) => p.folderId === f.id && (p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)))
+  const [folded, setFolded] = useState<Set<string>>(new Set())
+  const toggleFold = (id: string) =>
+    setFolded((prev) => {
+      const next = new Set(prev)
+      if (!next.delete(id)) next.add(id)
+      return next
     })
-  }, [folders, projects, q])
+
+  const q = search.trim().toLowerCase()
+
+  const activeFolderId = projects.find((p) => p.id === selectedProjectId)?.folderId ?? selectedFolderId
+  const activeProjects = projects
+    .filter((p) => p.folderId === activeFolderId)
+    .filter((p) => !q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
+    .toSorted((a, b) => a.name.localeCompare(b.name))
+
+  const visibleFolders = q
+    ? folders.filter(
+        (f) =>
+          f.name.toLowerCase().includes(q) ||
+          projects.some((p) => p.folderId === f.id && (p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))),
+      )
+    : folders
 
   return (
     <div className="flex h-full flex-col">
@@ -137,21 +154,28 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
           <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Folders</span>
         </div>
         <div className="space-y-0.5">
-          {visibleFolders.length === 0 && (
+          {visibleFolders.length === 0 && q && (
             <p className={`px-2.5 py-1 text-[13px] text-ink-faint ${collapsed ? 'lg:hidden' : ''}`}>No folders found.</p>
           )}
           {visibleFolders.map((folder) => {
             const count = projects.filter((p) => p.folderId === folder.id).length
-            const active = selectedFolderId === folder.id
+            const active = activeFolderId === folder.id
             return (
+              <div key={folder.id}>
               <div
-                key={folder.id}
                 className={`group flex items-center gap-1 rounded-md pr-1 transition-colors ${collapsed ? 'lg:pr-0' : ''} ${
-                  active ? 'bg-accent-soft text-accent' : 'text-ink-muted hover:bg-surface-3 hover:text-ink'
+                  active && !selectedProjectId ? 'bg-accent-soft text-accent' : active ? 'text-ink' : 'text-ink-muted hover:bg-surface-3 hover:text-ink'
                 }`}
               >
                 <button
-                  onClick={() => selectFolder(folder.id)}
+                  onClick={() => {
+                    selectFolder(folder.id)
+                    setFolded((prev) => {
+                      const next = new Set(prev)
+                      next.delete(folder.id)
+                      return next
+                    })
+                  }}
                   title={collapsed ? folder.name : undefined}
                   className={`flex flex-1 items-center gap-2 py-1.5 pl-2.5 text-left text-[13px] font-medium ${
                     collapsed ? 'lg:justify-center lg:pl-0' : ''
@@ -160,6 +184,14 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
                   <Icon name="folder" size={15} className="shrink-0" />
                   <span className={`flex-1 truncate ${collapsed ? 'lg:hidden' : ''}`}>{folder.name}</span>
                   <span className={`text-[11px] text-ink-faint ${collapsed ? 'lg:hidden' : ''}`}>{count}</span>
+                </button>
+                <button
+                  onClick={() => toggleFold(folder.id)}
+                  aria-label={folded.has(folder.id) ? 'Expand folder' : 'Collapse folder'}
+                  aria-expanded={!folded.has(folder.id)}
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-ink-faint hover:text-ink ${collapsed ? 'lg:hidden' : ''}`}
+                >
+                  <Icon name="chevron-right" size={13} className={`transition-transform ${active && !folded.has(folder.id) ? 'rotate-90' : ''}`} />
                 </button>
                 <div className={`opacity-0 transition-opacity group-hover:opacity-100 ${collapsed ? 'lg:hidden' : ''}`}>
                   <OverflowMenu
@@ -181,13 +213,36 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
                   />
                 </div>
               </div>
+              {active && !folded.has(folder.id) && !collapsed && (
+                <div className="ml-[18px] mt-0.5 space-y-0.5 border-l border-line pl-2">
+                  {activeProjects.length === 0 && <p className="px-2.5 py-1 text-[13px] text-ink-faint">No projects yet.</p>}
+                  {activeProjects.map((p) => {
+                    const selected = p.id === selectedProjectId
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => selectProject(p.id)}
+                        title={p.name}
+                        className={`flex w-full items-center rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors ${
+                          selected ? 'bg-accent-soft text-accent' : 'text-ink-muted hover:bg-surface-3 hover:text-ink'
+                        }`}
+                      >
+                        <span className="truncate">{p.name}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+              </div>
             )
           })}
         </div>
         <button
           onClick={() => setModal({ type: 'folder-create' })}
           title={collapsed ? 'New Folder' : undefined}
-          className={`mt-1.5 flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink ${
+          className={`mt-1.5 flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors hover:bg-surface-3 hover:text-ink ${
+            folders.length === 0 ? 'bg-accent-soft text-accent' : 'text-ink-muted'
+          } ${
             collapsed ? 'lg:justify-center' : ''
           }`}
         >
@@ -195,6 +250,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
           <span className={collapsed ? 'lg:hidden' : ''}>New Folder</span>
         </button>
       </div>
+
       </div>
 
       <div className={`shrink-0 border-t border-line px-3.5 py-3 ${collapsed ? 'lg:px-2' : ''}`}>

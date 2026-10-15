@@ -1,6 +1,6 @@
 import { useStore } from '../store'
 import { Icon } from './icons'
-import { Button, OverflowMenu } from './ui'
+import { OverflowMenu } from './ui'
 
 export function OptionTabs() {
   const variationId = useStore((s) => s.selectedVariationId)
@@ -10,20 +10,29 @@ export function OptionTabs() {
   const selectOption = useStore((s) => s.selectOption)
   const setModal = useStore((s) => s.setModal)
   const duplicateOption = useStore((s) => s.duplicateOption)
-  const openPreview = useStore((s) => s.openPreview)
+  const variationName = useStore((s) => s.variations.find((v) => v.id === s.selectedVariationId)?.name)
 
   if (!variationId) return null
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 px-6 py-3">
-      <div className="flex flex-wrap items-center gap-1.5">
+    <div className="flex flex-wrap items-start gap-x-4 gap-y-3 px-4 py-3">
+      <div className="flex min-h-9 w-44 shrink-0 items-center gap-2.5">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-btn text-[12px] font-semibold text-btn-fg shadow-sm">2</span>
+        <div className="min-w-0 leading-tight">
+          <div className="truncate text-[13px] font-semibold text-ink">Options</div>
+          <div className="truncate text-[11px] text-ink-faint" title={`Copy drafts in “${variationName}”`}>
+            Drafts in “{variationName}”
+          </div>
+        </div>
+      </div>
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
         {options.map((o) => {
           const active = o.id === selectedOptionId
           return (
             <div
               key={o.id}
-              className={`group flex shrink-0 items-center gap-1 rounded-md border px-2.5 py-1.5 text-[13px] font-medium transition-colors ${
-                active ? 'border-accent/30 bg-accent-soft text-accent' : 'border-line text-ink-muted hover:border-line-strong hover:bg-surface-2'
+              className={`group flex shrink-0 items-center gap-1 h-9 rounded-lg border px-3 text-[13px] font-medium transition-all ${
+                active ? 'border-accent/40 bg-accent-soft text-ink shadow-sm' : 'border-line bg-surface text-ink-muted hover:border-line-strong hover:text-ink'
               }`}
             >
               <button onClick={() => selectOption(o.id)} className="max-w-[220px] truncate">
@@ -55,17 +64,12 @@ export function OptionTabs() {
         })}
         <button
           onClick={() => setModal({ type: 'option-create' })}
-          className="flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink"
+          className="flex h-9 shrink-0 items-center gap-1 rounded-lg border border-dashed border-line-strong px-3 text-[13px] font-medium text-ink-muted transition-colors hover:border-accent/40 hover:bg-surface-3 hover:text-ink"
         >
           <Icon name="plus" size={14} />
           Add Option
         </button>
       </div>
-      {options.length > 0 && (
-        <Button variant="primary" size="sm" icon="eye" onClick={() => openPreview()}>
-          Preview Options
-        </Button>
-      )}
     </div>
   )
 }

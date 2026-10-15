@@ -1,6 +1,5 @@
 import { useStore } from '../store'
 import { formatRelative } from '../lib/time'
-import { Icon } from './icons'
 import { Button, EmptyState, IconButton, OverflowMenu } from './ui'
 import { VariationTabs } from './VariationTabs'
 import { OptionTabs } from './OptionTabs'
@@ -9,9 +8,7 @@ import { PreviewPanel } from './PreviewPanel'
 
 export function Workspace() {
   const project = useStore((s) => s.projects.find((p) => p.id === s.selectedProjectId))
-  const folder = useStore((s) => s.folders.find((f) => f.id === project?.folderId))
   const variation = useStore((s) => s.variations.find((v) => v.id === s.selectedVariationId))
-  const option = useStore((s) => s.options.find((o) => o.id === s.selectedOptionId))
   const allVariations = useStore((s) => s.variations)
   const projectId = useStore((s) => s.selectedProjectId)
   const variations = allVariations.filter((v) => v.projectId === projectId)
@@ -19,7 +16,6 @@ export function Workspace() {
   const toggleFavorite = useStore((s) => s.toggleFavorite)
   const setModal = useStore((s) => s.setModal)
   const duplicateProject = useStore((s) => s.duplicateProject)
-  const selectFolder = useStore((s) => s.selectFolder)
   const saveStatus = useStore((s) => s.saveStatus)
   const lastSavedAt = useStore((s) => s.lastSavedAt)
   const toast = useStore((s) => s.toast)
@@ -31,34 +27,6 @@ export function Workspace() {
     <div className="flex min-h-0 w-full flex-1 overflow-hidden">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="border-b border-line px-6 py-4">
-          <nav className="mb-2.5 flex flex-wrap items-center gap-1 text-xs text-ink-faint" aria-label="Breadcrumb">
-            <button onClick={() => useStore.getState().setSidebarNav('all')} className="transition-colors hover:text-ink">
-              All Projects
-            </button>
-            {folder && (
-              <>
-                <Icon name="chevron-right" size={11} />
-                <button onClick={() => selectFolder(folder.id)} className="transition-colors hover:text-ink">
-                  {folder.name}
-                </button>
-              </>
-            )}
-            <Icon name="chevron-right" size={11} />
-            <span className="text-ink">{project.name}</span>
-            {variation && (
-              <>
-                <Icon name="chevron-right" size={11} />
-                <span className="text-ink">{variation.name}</span>
-              </>
-            )}
-            {option && (
-              <>
-                <Icon name="chevron-right" size={11} />
-                <span className="text-ink">{option.name}</span>
-              </>
-            )}
-          </nav>
-
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <h1 className="truncate text-lg font-semibold tracking-tight text-ink">{project.name}</h1>
@@ -127,11 +95,16 @@ export function Workspace() {
           />
         ) : (
           <>
-            <VariationTabs />
-            {variation?.description && (
-              <p className="border-b border-line px-6 pb-2 pt-2 text-[13px] text-ink-muted">{variation.description}</p>
-            )}
-            <OptionTabs />
+            <div className="px-6 pt-4">
+              <div className="rounded-xl border border-line bg-surface-2/60">
+                <VariationTabs />
+                {variation?.description && (
+                  <p className="border-t border-line px-4 py-2 text-[13px] text-ink-muted">{variation.description}</p>
+                )}
+                <div className="border-t border-line" />
+                <OptionTabs />
+              </div>
+            </div>
             <CopyEditor />
           </>
         )}

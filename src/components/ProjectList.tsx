@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { useStore } from '../store'
+import { useAuthStore } from '../authStore'
 import { formatDate } from '../lib/time'
-import { Icon } from './icons'
+import { Icon, Logo } from './icons'
 import { Button, EmptyState, OverflowMenu } from './ui'
 import type { Project } from '../types'
 
@@ -14,6 +15,7 @@ export function ProjectList() {
   const recent = useStore((s) => s.recent)
   const search = useStore((s) => s.search)
   const setModal = useStore((s) => s.setModal)
+  const user = useAuthStore((s) => s.session?.user)
 
   const q = search.trim().toLowerCase()
 
@@ -52,21 +54,36 @@ export function ProjectList() {
   }, [projects, folders, selectedFolderId, sidebarNav, favorites, recent, q])
 
   if (folders.length === 0) {
+    const meta = user?.user_metadata as { full_name?: string; name?: string } | undefined
+    const raw = meta?.full_name ?? meta?.name ?? user?.email?.split('@')[0] ?? ''
+    const userName = raw.replace(/[._-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()).trim()
+    const steps = [
+      { icon: 'folder', title: 'Create a folder', body: 'Use New Folder in the sidebar.' },
+      { icon: 'file', title: 'Add a project', body: 'One project per campaign or test.' },
+      { icon: 'layers', title: 'Preview your copy draft', body: 'Compare variations side by side.' },
+    ] as const
     return (
-      <div className="flex flex-1 flex-col">
-        <div className="border-b border-line px-6 py-4 lg:px-10">
-          <h1 className="text-lg font-semibold tracking-tight text-ink">Copy Lab</h1>
-        </div>
-        <EmptyState
-          icon="folder"
-          title="Create your first folder"
-          description="Organize your copy projects into folders."
-          action={
-            <Button variant="primary" icon="plus" onClick={() => setModal({ type: 'folder-create' })}>
-              New Folder
-            </Button>
-          }
-        />
+      <div className="flex h-full flex-1 flex-col items-center justify-center px-6 py-16 text-center animate-card-in">
+        <Logo size={48} />
+        <p className="mt-6 text-sm font-medium text-accent">Hi, {userName || 'there'} 👋</p>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-ink">Welcome to CopyLab</h1>
+        <p className="mt-3 max-w-md text-[15px] leading-relaxed text-ink-muted">
+          Please create a folder from the sidebar to start organizing your copy projects.
+        </p>
+        <ol className="mt-10 grid w-full max-w-2xl gap-3 sm:grid-cols-3">
+          {steps.map((step, i) => (
+            <li key={step.title} className="rounded-xl border border-line bg-surface-2/60 p-4 text-left">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-soft text-[11px] font-semibold text-accent">
+                  {i + 1}
+                </span>
+                <Icon name={step.icon} size={14} className="text-ink-faint" />
+              </div>
+              <p className="text-[13px] font-semibold text-ink">{step.title}</p>
+              <p className="mt-0.5 text-[12px] leading-snug text-ink-muted">{step.body}</p>
+            </li>
+          ))}
+        </ol>
       </div>
     )
   }
