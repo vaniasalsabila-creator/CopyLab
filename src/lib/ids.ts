@@ -35,7 +35,7 @@ export function normalizeCopy(raw: Partial<CopyFields> | null | undefined): Copy
     whatsapp: { ...empty.whatsapp, ...raw?.whatsapp },
     whatsappIntro: { ...empty.whatsappIntro, ...raw?.whatsappIntro },
     whatsappCta: { ...empty.whatsappCta, ...raw?.whatsappCta },
-    whatsappShow: { ...empty.whatsappShow, ...raw?.whatsappShow },
+    whatsappShow: { ...empty.whatsappShow, ...raw?.whatsappShow, cta: true },
     whatsappCards: Array.isArray(raw?.whatsappCards)
       ? raw.whatsappCards.map((c) => ({
           id: c?.id ?? uid(),

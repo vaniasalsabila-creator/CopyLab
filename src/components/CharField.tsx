@@ -184,7 +184,7 @@ export function CopyField({
         <label
           htmlFor={fieldId}
           onClick={() => editorRef.current?.focus()}
-          className="text-[13px] font-medium text-ink"
+          className="text-[13px] font-semibold text-ink-muted"
         >
           {label}
         </label>

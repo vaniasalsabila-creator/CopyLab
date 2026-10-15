@@ -56,6 +56,7 @@ type Store = {
   previewChannel: Channel
   previewLang: Lang
   previewView: PreviewView
+  whatsappVariant: 'text' | 'image'
 
   mobileTab: MobileTab
   sidebarOpen: boolean
@@ -80,6 +81,7 @@ type Store = {
   setPreviewChannel: (channel: Channel) => void
   setPreviewLang: (lang: Lang) => void
   setPreviewView: (view: PreviewView) => void
+  setWhatsappVariant: (variant: 'text' | 'image') => void
   setMobileTab: (tab: MobileTab) => void
   setModal: (modal: Modal) => void
   toast: (message: string) => void
@@ -189,6 +191,7 @@ export const useStore = create<Store>()((set, get) => ({
   previewChannel: 'whatsapp',
   previewLang: 'en',
   previewView: 'preview',
+  whatsappVariant: 'text',
 
   mobileTab: 'edit',
   sidebarOpen: false,
@@ -311,6 +314,7 @@ export const useStore = create<Store>()((set, get) => ({
   setPreviewLang: (previewLang) => set({ previewLang }),
   setPreviewView: (previewView) => set({ previewView }),
   setMobileTab: (mobileTab) => set({ mobileTab }),
+  setWhatsappVariant: (whatsappVariant) => set({ whatsappVariant }),
   setModal: (modal) => set({ modal }),
 
   toast: (message) => {

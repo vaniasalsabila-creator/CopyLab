@@ -3,6 +3,7 @@ import { formatRelative } from '../lib/time'
 import { Button, EmptyState, IconButton, OverflowMenu } from './ui'
 import { VariationTabs } from './VariationTabs'
 import { OptionTabs } from './OptionTabs'
+import { ChannelTabs } from './ChannelTabs'
 import { CopyEditor } from './CopyEditor'
 import { PreviewPanel } from './PreviewPanel'
 
@@ -103,6 +104,8 @@ export function Workspace() {
                 )}
                 <div className="border-t border-line" />
                 <OptionTabs />
+                <div className="border-t border-line" />
+                <ChannelTabs />
               </div>
             </div>
             <CopyEditor />

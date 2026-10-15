@@ -3,6 +3,8 @@ import { countChars, LIMITS } from '../lib/chars'
 import { CounterLabel } from './CharField'
 import { FormattedText, InlineText } from './FormattedText'
 import { Icon } from './icons'
+import { useStore } from '../store'
+import { WhatsAppVariantTabs } from './WhatsAppVariantTabs'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 const GRADIENT_BORDER = 'linear-gradient(115deg, #34d399, #38bdf8, #a78bfa, #34d399)'
@@ -22,16 +24,27 @@ const WA_WALLPAPER =
   'radial-gradient(circle at 8px 8px, rgba(0,0,0,0.045) 1.4px, transparent 1.5px),' +
   'radial-gradient(circle at 22px 26px, rgba(0,0,0,0.035) 1px, transparent 1.1px)'
 
-function ChatBubble({ text }: { text: string }) {
+function ChatBubble({ text, cta, showCta }: { text: string; cta: string; showCta: boolean }) {
   return (
-    <div className="relative ml-1.5 mr-6 max-w-full rounded-[18px] rounded-bl-none bg-white px-3.5 pb-1.5 pt-2.5 text-[13.5px] leading-[1.4] text-[#111b21]">
+    <div className="relative ml-1.5 mr-6 max-w-full rounded-[18px] rounded-bl-none bg-white text-[13.5px] leading-[1.4] text-[#111b21]">
       <IosChatBubbleTail />
-      {text ? (
-        <FormattedText text={text} />
-      ) : (
-        <span className="italic text-[#8696a0]">No copy written yet.</span>
+      <div className="px-3.5 pb-1.5 pt-2.5">
+        {text ? (
+          <FormattedText text={text} />
+        ) : (
+          <span className="italic text-[#8696a0]">No copy written yet.</span>
+        )}
+        <div className="mt-0.5 text-right text-[10.5px] text-[#667781]">9:41 AM</div>
+      </div>
+      {showCta && (
+        <div
+          className="flex items-center justify-center gap-2 border-t border-[#e4e4e4] py-2.5 text-[13.5px]"
+          style={{ color: WA_BRAND }}
+        >
+          <ExternalLinkIcon />
+          {cta ? <InlineText text={cta} /> : <span className="italic text-[#8696a0]">No CTA yet</span>}
+        </div>
       )}
-      <div className="mt-0.5 text-right text-[10.5px] text-[#667781]">9:41 AM</div>
     </div>
   )
 }
@@ -283,7 +296,7 @@ function IosWhatsAppFrame({ children, detail, reactions = true }: { children: Re
 }
 
 export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang | 'both' }) {
-  const [variant, setVariant] = useState<1 | 2>(1)
+  const variant = useStore((s) => s.whatsappVariant)
   const [phoneWidth, setPhoneWidth] = useState<PhoneWidth>(360)
   const [open, setOpen] = useState<{ lang: Lang; index: number } | null>(null)
   const langs: Lang[] = lang === 'both' ? ['en', 'id'] : [lang]
@@ -297,20 +310,7 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
   return (
     <div className="space-y-2.5">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-        <div className="flex rounded-md bg-surface-3 p-0.5">
-          {([1, 2] as const).map((v) => (
-            <button
-              key={v}
-              type="button"
-              onClick={() => setVariant(v)}
-              className={`rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                variant === v ? 'bg-surface text-ink shadow-sm' : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              {v === 1 ? 'Text' : 'Text + Image'}
-            </button>
-          ))}
-        </div>
+        <WhatsAppVariantTabs />
         <div className="flex items-center gap-1.5 text-[11px] text-ink-muted">
           <div className="flex rounded-md bg-surface-3 p-0.5">
             {PHONE_WIDTHS.map((w) => (
@@ -336,10 +336,10 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
       </div>
 
       <PhoneViewport width={phoneWidth}>
-      {variant === 1 ? (
+      {variant === 'text' ? (
         <IosWhatsAppFrame reactions={false}>
           {langs.map((l) => (
-            <ChatBubble key={l} text={copy.whatsapp[l]} />
+            <ChatBubble key={l} text={copy.whatsapp[l]} cta={copy.whatsappCta[l]} showCta={copy.whatsappShow.cta} />
           ))}
         </IosWhatsAppFrame>
       ) : (
@@ -388,10 +388,10 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
         {langs.map((l) => (
           <LangBlock key={l} lang={lang === 'both' ? l : undefined}>
             <CounterLabel count={countChars(copy.whatsapp[l])} max={LIMITS.whatsapp} warnAt={LIMITS.whatsappWarn} />
-            {variant === 2 && copy.whatsappShow.intro && (
+            {variant === 'image' && copy.whatsappShow.intro && (
               <CounterLabel count={countChars(copy.whatsappIntro[l])} max={LIMITS.whatsapp} warnAt={LIMITS.whatsappWarn} />
             )}
-            {variant === 2 && copy.whatsappShow.cta && <CounterLabel count={countChars(copy.whatsappCta[l])} max={LIMITS.whatsappCta} />}
+            {copy.whatsappShow.cta && <CounterLabel count={countChars(copy.whatsappCta[l])} max={LIMITS.whatsappCta} />}
           </LangBlock>
         ))}
       </div>

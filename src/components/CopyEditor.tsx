@@ -5,14 +5,8 @@ import { fileToBannerDataUrl } from '../lib/image'
 import { CopyField } from './CharField'
 import { CarouselEditor } from './CarouselEditor'
 import { Button, EmptyState } from './ui'
-import type { Channel, Lang } from '../types'
-
-const CHANNEL_TABS: { id: Channel; label: string }[] = [
-  { id: 'whatsapp', label: 'WhatsApp Blast' },
-  { id: 'push', label: 'Push Notification' },
-  { id: 'sms', label: 'SMS' },
-  { id: 'flightAssistant', label: 'Flight Assistant' },
-]
+import { WhatsAppVariantTabs } from './WhatsAppVariantTabs'
+import type { Lang } from '../types'
 
 function WhatsAppSection({
   title,
@@ -28,7 +22,9 @@ function WhatsAppSection({
   return (
     <div>
       <div className="mb-3 flex items-center gap-2.5">
-        <h3 className="text-[13px] font-semibold uppercase tracking-wide text-ink-faint">{title}</h3>
+        <h3 className="text-[15px] font-semibold tracking-tight text-ink">
+          {title}
+        </h3>
         {onToggle && (
           <button
             type="button"
@@ -36,7 +32,7 @@ function WhatsAppSection({
             aria-checked={on}
             aria-label={`Show ${title}`}
             onClick={() => onToggle(!on)}
-            className={`relative h-[18px] w-8 shrink-0 rounded-full transition-colors ${on ? 'bg-accent' : 'bg-surface-3'}`}
+            className={`relative h-[18px] w-8 shrink-0 rounded-full transition-colors ${on ? 'bg-[#007CFF]' : 'bg-line-strong'}`}
           >
             <span
               className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white shadow transition-all ${on ? 'left-[16px]' : 'left-0.5'}`}
@@ -54,7 +50,8 @@ const LANGS: Lang[] = ['en', 'id']
 export function CopyEditor() {
   const option = useStore((s) => s.options.find((o) => o.id === s.selectedOptionId))
   const channel = useStore((s) => s.channel)
-  const setChannel = useStore((s) => s.setChannel)
+  const variant = useStore((s) => s.whatsappVariant)
+  const isImage = variant === 'image'
   const updateCopy = useStore((s) => s.updateCopy)
   const setModal = useStore((s) => s.setModal)
 
@@ -72,7 +69,7 @@ export function CopyEditor() {
   }
 
   const show = option?.copy.whatsappShow ?? { intro: false, banner: true, cta: true, carousel: false }
-  function setShow(key: 'intro' | 'banner' | 'cta' | 'carousel', value: boolean) {
+  function setShow(key: 'intro' | 'banner' | 'carousel', value: boolean) {
     if (option) updateCopy(option.id, (c) => ({ ...c, whatsappShow: { ...c.whatsappShow, [key]: value } }))
   }
 
@@ -95,25 +92,11 @@ export function CopyEditor() {
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-6 py-3">
-        <div className="flex rounded-lg bg-surface-3 p-0.5">
-          {CHANNEL_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setChannel(tab.id)}
-              className={`rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors ${
-                channel === tab.id ? 'bg-surface text-ink shadow-sm' : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="flex-1 px-6 py-5">
         {channel === 'whatsapp' ? (
-          <div className="space-y-6">
+          <div className="space-y-7">
+            <WhatsAppVariantTabs size="md" />
+            {isImage && (
             <WhatsAppSection title="Text bubble above card" on={show.intro} onToggle={(v) => setShow('intro', v)}>
             <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
               {langs.map((lang) => (
@@ -130,13 +113,15 @@ export function CopyEditor() {
               ))}
             </div>
             </WhatsAppSection>
+            )}
+            {isImage && (
             <WhatsAppSection title="Banner image" on={show.banner} onToggle={(v) => setShow('banner', v)}>
             <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
               {langs.map((lang) => {
                 const banner = option.copy.whatsappBanner[lang]
                 return (
                   <div key={lang}>
-                    <div className="mb-1.5 text-xs font-medium text-ink-muted">{lang === 'en' ? 'English' : 'Indonesian'}</div>
+                    <div className="mb-1.5 text-[13px] font-semibold text-ink-muted">{lang === 'en' ? 'English' : 'Indonesian'}</div>
                     <input
                       ref={(el) => {
                         fileRefs.current[lang] = el
@@ -181,6 +166,7 @@ export function CopyEditor() {
               })}
             </div>
             </WhatsAppSection>
+            )}
             <WhatsAppSection title="Message (card text)">
             <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
               {langs.map((lang) => (
@@ -197,7 +183,7 @@ export function CopyEditor() {
               ))}
             </div>
             </WhatsAppSection>
-            <WhatsAppSection title="CTA Copy message" on={show.cta} onToggle={(v) => setShow('cta', v)}>
+            <WhatsAppSection title="CTA Copy message">
             <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
               {langs.map((lang) => (
                 <CopyField
@@ -212,14 +198,16 @@ export function CopyEditor() {
               ))}
             </div>
             </WhatsAppSection>
+            {isImage && (
             <WhatsAppSection title="Carousel" on={show.carousel} onToggle={(v) => setShow('carousel', v)}>
               <CarouselEditor option={option} langs={langs} />
             </WhatsAppSection>
+            )}
           </div>
         ) : channel === 'push' ? (
           <div className="space-y-6">
             <div>
-              <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">Title</h3>
+              <h3 className="mb-3 text-[15px] font-semibold tracking-tight text-ink">Title</h3>
               <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
                 {langs.map((lang) => (
                   <CopyField
@@ -235,7 +223,7 @@ export function CopyEditor() {
               </div>
             </div>
             <div>
-              <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">Subtitle</h3>
+              <h3 className="mb-3 text-[15px] font-semibold tracking-tight text-ink">Subtitle</h3>
               <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
                 {langs.map((lang) => (
                   <CopyField
@@ -253,7 +241,7 @@ export function CopyEditor() {
           </div>
         ) : channel === 'sms' ? (
           <div>
-            <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">SMS</h3>
+            <h3 className="mb-3 text-[15px] font-semibold tracking-tight text-ink">SMS</h3>
             <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
               {langs.map((lang) => (
                 <CopyField
@@ -272,7 +260,7 @@ export function CopyEditor() {
         ) : (
           <div className="space-y-6">
             <div>
-              <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">Title</h3>
+              <h3 className="mb-3 text-[15px] font-semibold tracking-tight text-ink">Title</h3>
               <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
                 {langs.map((lang) => (
                   <CopyField
@@ -293,7 +281,7 @@ export function CopyEditor() {
               </div>
             </div>
             <div>
-              <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-ink-faint">Description</h3>
+              <h3 className="mb-3 text-[15px] font-semibold tracking-tight text-ink">Description</h3>
               <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
                 {langs.map((lang) => (
                   <CopyField
