@@ -41,8 +41,10 @@ export type CopyFields = {
   /** Optional text bubble shown above the card. */
   whatsappIntro: { en: string; id: string }
   whatsappCta: { en: string; id: string }
+  /** Optional second CTA button, stacked under the main one (shown only when whatsappShow.cta2 is on). */
+  whatsappCta2: { en: string; id: string }
   /** Which optional parts of the WhatsApp message are switched on. */
-  whatsappShow: { intro: boolean; banner: boolean; cta: boolean; carousel: boolean }
+  whatsappShow: { intro: boolean; banner: boolean; cta: boolean; cta2: boolean; carousel: boolean }
   /** Extra carousel cards beside the main one (shown only when whatsappShow.carousel is on). */
   whatsappCards: WhatsAppCard[]
   /** Banner image per language, as compressed data URLs. */

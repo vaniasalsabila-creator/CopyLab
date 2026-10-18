@@ -24,7 +24,7 @@ const WA_WALLPAPER =
   'radial-gradient(circle at 8px 8px, rgba(0,0,0,0.045) 1.4px, transparent 1.5px),' +
   'radial-gradient(circle at 22px 26px, rgba(0,0,0,0.035) 1px, transparent 1.1px)'
 
-function ChatBubble({ text, cta, showCta }: { text: string; cta: string; showCta: boolean }) {
+function ChatBubble({ text, cta, showCta, cta2 }: { text: string; cta: string; showCta: boolean; cta2?: string }) {
   return (
     <div className="relative ml-1.5 mr-6 max-w-full rounded-[18px] rounded-bl-none bg-white text-[13.5px] leading-[1.4] text-[#111b21]">
       <IosChatBubbleTail />
@@ -36,15 +36,8 @@ function ChatBubble({ text, cta, showCta }: { text: string; cta: string; showCta
         )}
         <div className="mt-0.5 text-right text-[10.5px] text-[#667781]">9:41 AM</div>
       </div>
-      {showCta && (
-        <div
-          className="flex items-center justify-center gap-2 border-t border-[#e4e4e4] py-2.5 text-[13.5px]"
-          style={{ color: WA_BRAND }}
-        >
-          <ExternalLinkIcon />
-          {cta ? <InlineText text={cta} /> : <span className="italic text-[#8696a0]">No CTA yet</span>}
-        </div>
-      )}
+      {showCta && <CtaRow text={cta} />}
+      {showCta && cta2 !== undefined && <CtaRow text={cta2} />}
     </div>
   )
 }
@@ -81,10 +74,20 @@ function ExternalLinkIcon() {
   )
 }
 
+function CtaRow({ text }: { text: string }) {
+  return (
+    <div className="flex items-center justify-center gap-2 border-t border-[#e4e4e4] py-2.5 text-[13.5px]" style={{ color: WA_BRAND }}>
+      <ExternalLinkIcon />
+      {text ? <InlineText text={text} /> : <span className="italic text-[#8696a0]">No CTA yet</span>}
+    </div>
+  )
+}
+
 /** Native-style WhatsApp card: banner on top, body text, "Read more", then a CTA row. */
 function RichChatBubble({
   text,
   cta,
+  cta2,
   banner,
   show,
   onOpen,
@@ -93,6 +96,7 @@ function RichChatBubble({
 }: {
   text: string
   cta: string
+  cta2?: string
   banner: string
   show: CopyFields['whatsappShow']
   onOpen: () => void
@@ -124,15 +128,8 @@ function RichChatBubble({
           Read more
         </button>
       </div>
-      {show.cta && (
-        <div
-          className="flex items-center justify-center gap-2 border-t border-[#e4e4e4] py-2.5 text-[13.5px]"
-          style={{ color: WA_BRAND }}
-        >
-          <ExternalLinkIcon />
-          {cta ? <InlineText text={cta} /> : <span className="italic text-[#8696a0]">No CTA yet</span>}
-        </div>
-      )}
+      {show.cta && <CtaRow text={cta} />}
+      {show.cta && cta2 !== undefined && <CtaRow text={cta2} />}
     </div>
   )
 }
@@ -158,12 +155,14 @@ function ThumbIcon({ down }: { down?: boolean }) {
 function MessageDetail({
   text,
   cta,
+  cta2,
   banner,
   show,
   onClose,
 }: {
   text: string
   cta: string
+  cta2?: string
   banner: string
   show: CopyFields['whatsappShow']
   onClose: () => void
@@ -197,11 +196,13 @@ function MessageDetail({
           {text ? <FormattedText text={text} /> : <span className="italic text-[#8696a0]">No copy written yet.</span>}
         </div>
         {show.cta && (
-          <div className="flex justify-end px-3 pb-3 pt-4">
-            <div className="flex items-center gap-2 rounded-full bg-[#00a884] px-4 py-2 text-[13.5px] font-medium text-white">
-              <ExternalLinkIcon />
-              {cta ? <InlineText text={cta} /> : <span className="italic font-normal text-white/70">No CTA yet</span>}
-            </div>
+          <div className="flex flex-col items-end gap-2 px-3 pb-3 pt-4">
+            {[cta, ...(cta2 !== undefined ? [cta2] : [])].map((label, i) => (
+              <div key={i} className="flex items-center gap-2 rounded-full bg-[#00a884] px-4 py-2 text-[13.5px] font-medium text-white">
+                <ExternalLinkIcon />
+                {label ? <InlineText text={label} /> : <span className="italic font-normal text-white/70">No CTA yet</span>}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -301,7 +302,12 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
   const [open, setOpen] = useState<{ lang: Lang; index: number } | null>(null)
   const langs: Lang[] = lang === 'both' ? ['en', 'id'] : [lang]
   const cardsFor = (l: Lang) => [
-    { text: copy.whatsapp[l], cta: copy.whatsappCta[l], banner: copy.whatsappBanner[l] },
+    {
+      text: copy.whatsapp[l],
+      cta: copy.whatsappCta[l],
+      cta2: copy.whatsappShow.cta2 ? copy.whatsappCta2[l] : undefined,
+      banner: copy.whatsappBanner[l],
+    },
     ...(copy.whatsappShow.carousel
       ? copy.whatsappCards.map((c) => ({ text: c.text[l], cta: c.cta[l], banner: c.banner[l] }))
       : []),
@@ -339,7 +345,7 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
       {variant === 'text' ? (
         <IosWhatsAppFrame reactions={false}>
           {langs.map((l) => (
-            <ChatBubble key={l} text={copy.whatsapp[l]} cta={copy.whatsappCta[l]} showCta={copy.whatsappShow.cta} />
+            <ChatBubble key={l} text={copy.whatsapp[l]} cta={copy.whatsappCta[l]} showCta={copy.whatsappShow.cta} cta2={copy.whatsappShow.cta2 ? copy.whatsappCta2[l] : undefined} />
           ))}
         </IosWhatsAppFrame>
       ) : (
@@ -349,6 +355,7 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
               <MessageDetail
                 text={openCard.text}
                 cta={openCard.cta}
+                cta2={openCard.cta2}
                 banner={openCard.banner}
                 show={copy.whatsappShow}
                 onClose={() => setOpen(null)}
@@ -392,6 +399,9 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
               <CounterLabel count={countChars(copy.whatsappIntro[l])} max={LIMITS.whatsapp} warnAt={LIMITS.whatsappWarn} />
             )}
             {copy.whatsappShow.cta && <CounterLabel count={countChars(copy.whatsappCta[l])} max={LIMITS.whatsappCta} />}
+            {copy.whatsappShow.cta && copy.whatsappShow.cta2 && (
+              <CounterLabel count={countChars(copy.whatsappCta2[l])} max={LIMITS.whatsappCta} />
+            )}
           </LangBlock>
         ))}
       </div>

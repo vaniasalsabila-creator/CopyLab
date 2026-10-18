@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useId, useLayoutEffect, useRef, useState } from 'react'
 import { countChars, formatCount, limitTone, remainingLabel } from '../lib/chars'
 import { Icon } from './icons'
 import type { IconName } from './icons'
@@ -176,7 +176,7 @@ export function CopyField({
     }
   }
 
-  const fieldId = `field-${label.replace(/\s+/g, '-').toLowerCase()}-${max}`
+  const fieldId = useId()
 
   return (
     <div className="space-y-1.5">

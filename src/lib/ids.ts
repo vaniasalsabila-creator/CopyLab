@@ -9,7 +9,8 @@ export function emptyCopy(): CopyFields {
     whatsapp: { en: '', id: '' },
     whatsappIntro: { en: '', id: '' },
     whatsappCta: { en: '', id: '' },
-    whatsappShow: { intro: false, banner: true, cta: true, carousel: false },
+    whatsappCta2: { en: '', id: '' },
+    whatsappShow: { intro: false, banner: true, cta: true, cta2: false, carousel: false },
     whatsappCards: [],
     whatsappBanner: { en: '', id: '' },
     push: {
@@ -35,6 +36,7 @@ export function normalizeCopy(raw: Partial<CopyFields> | null | undefined): Copy
     whatsapp: { ...empty.whatsapp, ...raw?.whatsapp },
     whatsappIntro: { ...empty.whatsappIntro, ...raw?.whatsappIntro },
     whatsappCta: { ...empty.whatsappCta, ...raw?.whatsappCta },
+    whatsappCta2: { ...empty.whatsappCta2, ...raw?.whatsappCta2 },
     whatsappShow: { ...empty.whatsappShow, ...raw?.whatsappShow, cta: true },
     whatsappCards: Array.isArray(raw?.whatsappCards)
       ? raw.whatsappCards.map((c) => ({

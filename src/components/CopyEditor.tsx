@@ -68,8 +68,8 @@ export function CopyEditor() {
     }
   }
 
-  const show = option?.copy.whatsappShow ?? { intro: false, banner: true, cta: true, carousel: false }
-  function setShow(key: 'intro' | 'banner' | 'carousel', value: boolean) {
+  const show = option?.copy.whatsappShow ?? { intro: false, banner: true, cta: true, cta2: false, carousel: false }
+  function setShow(key: 'intro' | 'banner' | 'cta2' | 'carousel', value: boolean) {
     if (option) updateCopy(option.id, (c) => ({ ...c, whatsappShow: { ...c.whatsappShow, [key]: value } }))
   }
 
@@ -192,6 +192,21 @@ export function CopyEditor() {
                   value={option.copy.whatsappCta[lang]}
                   onChange={(v) => updateCopy(option.id, (c) => ({ ...c, whatsappCta: { ...c.whatsappCta, [lang]: v } }))}
                   placeholder={lang === 'en' ? 'e.g. BUY 1 GET 4' : 'cth. BELI 1 DAPAT 4'}
+                  max={LIMITS.whatsappCta}
+                  multiline={false}
+                />
+              ))}
+            </div>
+            </WhatsAppSection>
+            <WhatsAppSection title="CTA Copy message 2" on={show.cta2} onToggle={(v) => setShow('cta2', v)}>
+            <div className={`grid gap-5 ${langs.length > 1 ? 'md:grid-cols-2' : 'max-w-xl'}`}>
+              {langs.map((lang) => (
+                <CopyField
+                  key={lang}
+                  label={lang === 'en' ? 'English' : 'Indonesian'}
+                  value={option.copy.whatsappCta2[lang]}
+                  onChange={(v) => updateCopy(option.id, (c) => ({ ...c, whatsappCta2: { ...c.whatsappCta2, [lang]: v } }))}
+                  placeholder={lang === 'en' ? 'e.g. SEE DETAILS' : 'cth. LIHAT DETAIL'}
                   max={LIMITS.whatsappCta}
                   multiline={false}
                 />
