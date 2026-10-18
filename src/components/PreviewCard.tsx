@@ -309,7 +309,7 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
       banner: copy.whatsappBanner[l],
     },
     ...(copy.whatsappShow.carousel
-      ? copy.whatsappCards.map((c) => ({ text: c.text[l], cta: c.cta[l], banner: c.banner[l] }))
+      ? copy.whatsappCards.map((c) => ({ text: c.text[l], cta: c.cta[l], cta2: undefined, banner: c.banner[l] }))
       : []),
   ]
   const openCard = open && langs.includes(open.lang) ? cardsFor(open.lang)[open.index] : undefined
