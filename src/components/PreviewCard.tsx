@@ -30,7 +30,7 @@ const BUBBLE_SHADOW = 'shadow-[0_1px_1px_rgba(0,0,0,0.13)]'
 const TIME_SPACER = <span aria-hidden="true" className="inline-block h-px w-[66px]" />
 
 function BubbleTime({ children }: { children: string }) {
-  return <span className="absolute bottom-1.5 right-3.5 text-[11px] leading-none text-[#8a949a]">{children}</span>
+  return <span className="absolute bottom-1.5 right-3.5 whitespace-nowrap text-[11px] leading-none text-[#8a949a]">{children}</span>
 }
 
 function ChatBubble({ text, cta, showCta, cta2 }: { text: string; cta: string; showCta: boolean; cta2?: string }) {
@@ -133,7 +133,7 @@ function RichChatBubble({
         ) : (
           <span className="italic text-[#8696a0]">No copy written yet.</span>
         )}
-        <button type="button" onClick={onOpen} className="mt-auto block self-start pt-3 text-[14px]" style={{ color: WA_BRAND }}>
+        <button type="button" onClick={onOpen} className="mt-auto block self-start whitespace-nowrap pt-3 text-[14px]" style={{ color: WA_BRAND }}>
           Read more
         </button>
       </div>
@@ -321,7 +321,7 @@ function IosWhatsAppFrame({
 
       <div className={`space-y-3 px-3 pb-3 pt-4 ${fixed ? 'flex-1' : ''}`} style={{ backgroundColor: WA_CHAT_BG, backgroundImage: WA_WALLPAPER, backgroundSize: '100% auto', backgroundRepeat: 'repeat-y' }}>
         <div className="flex justify-center">
-          <span className={`rounded-full bg-white px-3.5 py-1 text-[13px] font-semibold text-[#111b21] ${BUBBLE_SHADOW}`}>12 Dec 2025</span>
+          <span className={`whitespace-nowrap rounded-full bg-white px-3.5 py-1 text-[13px] font-semibold text-[#111b21] ${BUBBLE_SHADOW}`}>12 Dec 2025</span>
         </div>
         {children}
         <div className={`gap-2 ${reactions ? 'flex' : 'hidden'}`}>
