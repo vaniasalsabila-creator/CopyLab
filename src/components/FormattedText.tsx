@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { parseBlocks, parseInline } from '../lib/richText'
 
 export function InlineText({ text }: { text: string }) {
@@ -15,11 +15,15 @@ export function InlineText({ text }: { text: string }) {
   )
 }
 
-export function FormattedText({ text, className = '' }: { text: string; className?: string }) {
-  if (!text) return null
+export function FormattedText({ text, className = '', trailing }: { text: string; className?: string; trailing?: ReactNode }) {
+  // WhatsApp drops trailing blank lines, so don't render them as extra empty space.
+  const trimmed = text.replace(/\s+$/, '')
+  if (!trimmed) return null
+  const blocks = parseBlocks(trimmed)
   return (
     <div className={`space-y-1.5 ${className}`}>
-      {parseBlocks(text).map((block, i) => {
+      {blocks.map((block, i) => {
+        const isLast = i === blocks.length - 1
         if (block.type === 'quote') {
           return (
             <blockquote key={i} className="space-y-0.5 border-l-2 border-current/30 pl-2 italic opacity-90">
@@ -50,6 +54,7 @@ export function FormattedText({ text, className = '' }: { text: string; classNam
                 <InlineText text={line} />
               </Fragment>
             ))}
+            {isLast && trailing}
           </p>
         )
       })}

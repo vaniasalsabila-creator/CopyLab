@@ -6,6 +6,8 @@ import { Icon } from './icons'
 import { useStore } from '../store'
 import { WhatsAppVariantTabs } from './WhatsAppVariantTabs'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { toPng } from 'html-to-image'
+import { Button } from './ui'
 
 const GRADIENT_BORDER = 'linear-gradient(115deg, #34d399, #38bdf8, #a78bfa, #34d399)'
 
@@ -20,21 +22,28 @@ function LangBlock({ children, lang }: { children: ReactNode; lang?: Lang }) {
 
 const APP_ICON_SRC = '/ICON_TIKET15.png'
 
-const WA_WALLPAPER =
-  'radial-gradient(circle at 8px 8px, rgba(0,0,0,0.045) 1.4px, transparent 1.5px),' +
-  'radial-gradient(circle at 22px 26px, rgba(0,0,0,0.035) 1px, transparent 1.1px)'
+const WA_WALLPAPER = "url('/wa-wallpaper-2.jpg')"
+const WA_CHAT_BG = '#f5f0e8'
+const BUBBLE_SHADOW = 'shadow-[0_1px_1px_rgba(0,0,0,0.13)]'
+
+/** Reserves room on the last text line for the timestamp, which sits bottom-right inside the bubble like in WhatsApp. */
+const TIME_SPACER = <span aria-hidden="true" className="inline-block h-px w-[66px]" />
+
+function BubbleTime({ children }: { children: string }) {
+  return <span className="absolute bottom-1.5 right-3.5 text-[11px] leading-none text-[#8a949a]">{children}</span>
+}
 
 function ChatBubble({ text, cta, showCta, cta2 }: { text: string; cta: string; showCta: boolean; cta2?: string }) {
   return (
-    <div className="relative ml-1.5 mr-6 max-w-full rounded-[18px] rounded-bl-none bg-white text-[13.5px] leading-[1.4] text-[#111b21]">
+    <div className={`relative ml-1.5 mr-6 max-w-full rounded-[18px] rounded-bl-none bg-white text-[14px] leading-[1.4] text-[#111b21] ${BUBBLE_SHADOW}`}>
       <IosChatBubbleTail />
-      <div className="px-3.5 pb-1.5 pt-2.5">
+      <div className="relative px-3.5 pb-2 pt-2">
         {text ? (
-          <FormattedText text={text} />
+          <FormattedText text={text} trailing={TIME_SPACER} />
         ) : (
-          <span className="italic text-[#8696a0]">No copy written yet.</span>
+          <span className="italic text-[#8696a0]">No copy written yet.{TIME_SPACER}</span>
         )}
-        <div className="mt-0.5 text-right text-[10.5px] text-[#667781]">9:41 AM</div>
+        <BubbleTime>9:41 AM</BubbleTime>
       </div>
       {showCta && <CtaRow text={cta} />}
       {showCta && cta2 !== undefined && <CtaRow text={cta2} />}
@@ -76,7 +85,7 @@ function ExternalLinkIcon() {
 
 function CtaRow({ text }: { text: string }) {
   return (
-    <div className="flex items-center justify-center gap-2 border-t border-[#e4e4e4] py-2.5 text-[13.5px]" style={{ color: WA_BRAND }}>
+    <div className="flex items-center justify-center gap-2 border-t border-[#e4e4e4] py-2.5 text-[14px]" style={{ color: WA_BRAND }}>
       <ExternalLinkIcon />
       {text ? <InlineText text={text} /> : <span className="italic text-[#8696a0]">No CTA yet</span>}
     </div>
@@ -106,7 +115,7 @@ function RichChatBubble({
 }) {
   return (
     <div
-      className={`relative flex flex-col rounded-[18px] bg-white text-[#111b21] ${tail ? 'rounded-bl-none' : ''} ${
+      className={`relative flex flex-col rounded-[18px] bg-white text-[#111b21] ${BUBBLE_SHADOW} ${tail ? 'rounded-bl-none' : ''} ${
         carousel ? 'w-[calc(100%-68px)] shrink-0 snap-start' : 'mr-6 max-w-full'
       }`}
     >
@@ -116,7 +125,7 @@ function RichChatBubble({
           <BannerPlaceholder src={banner} />
         </button>
       )}
-      <div className="flex flex-1 flex-col px-3.5 pb-3 pt-2.5 text-[13.5px] leading-[1.4]">
+      <div className="flex flex-1 flex-col px-3.5 pb-3 pt-2.5 text-[14px] leading-[1.4]">
         {text ? (
           <div className="line-clamp-3">
             <FormattedText text={text} />
@@ -124,7 +133,7 @@ function RichChatBubble({
         ) : (
           <span className="italic text-[#8696a0]">No copy written yet.</span>
         )}
-        <button type="button" onClick={onOpen} className="mt-auto block self-start pt-3 text-[13.5px]" style={{ color: WA_BRAND }}>
+        <button type="button" onClick={onOpen} className="mt-auto block self-start pt-3 text-[14px]" style={{ color: WA_BRAND }}>
           Read more
         </button>
       </div>
@@ -136,9 +145,13 @@ function RichChatBubble({
 
 function IntroBubble({ text }: { text: string }) {
   return (
-    <div className="mr-6 max-w-full rounded-[18px] bg-white px-3.5 pb-1.5 pt-2.5 text-[13.5px] leading-[1.4] text-[#111b21]">
-      {text ? <FormattedText text={text} /> : <span className="italic text-[#8696a0]">No intro written yet.</span>}
-      <div className="text-right text-[10.5px] text-[#667781]">6.35 PM</div>
+    <div className={`relative mr-6 max-w-full rounded-[18px] bg-white px-3.5 pb-2 pt-2 text-[14px] leading-[1.4] text-[#111b21] ${BUBBLE_SHADOW}`}>
+      {text ? (
+        <FormattedText text={text} trailing={TIME_SPACER} />
+      ) : (
+        <span className="italic text-[#8696a0]">No intro written yet.{TIME_SPACER}</span>
+      )}
+      <BubbleTime>6:35 PM</BubbleTime>
     </div>
   )
 }
@@ -192,13 +205,13 @@ function MessageDetail({
             <BannerPlaceholder src={banner} aspect={BANNER_FULL_ASPECT} />
           </div>
         )}
-        <div className={`mx-3 border-t ${show.banner ? 'mt-6' : 'mt-3'} border-[#eeeeee] pt-4 text-[13.5px] leading-[1.45] text-[#111b21]`}>
+        <div className={`mx-3 border-t ${show.banner ? 'mt-6' : 'mt-3'} border-[#eeeeee] pt-4 text-[14px] leading-[1.45] text-[#111b21]`}>
           {text ? <FormattedText text={text} /> : <span className="italic text-[#8696a0]">No copy written yet.</span>}
         </div>
         {show.cta && (
           <div className="flex flex-col items-end gap-2 px-3 pb-3 pt-4">
             {[cta, ...(cta2 !== undefined ? [cta2] : [])].map((label, i) => (
-              <div key={i} className="flex items-center gap-2 rounded-full bg-[#00a884] px-4 py-2 text-[13.5px] font-medium text-white">
+              <div key={i} className="flex items-center gap-2 rounded-full bg-[#00a884] px-4 py-2 text-[14px] font-medium text-white">
                 <ExternalLinkIcon />
                 {label ? <InlineText text={label} /> : <span className="italic font-normal text-white/70">No CTA yet</span>}
               </div>
@@ -243,11 +256,55 @@ function PhoneViewport({ width, children }: { width: PhoneWidth; children: React
   )
 }
 
-function IosWhatsAppFrame({ children, detail, reactions = true }: { children: ReactNode; detail?: ReactNode; reactions?: boolean }) {
+function IosStatusBar() {
   return (
-    <div className="relative w-full overflow-hidden rounded-xl bg-[#f0ece6] shadow-sm">
+    <div className="flex h-11 items-center justify-between bg-[#f6f3ee] px-7 pt-1 text-[#111b21]">
+      <span className="w-14 text-[15px] font-semibold tracking-tight">9:41</span>
+      <div className="flex items-center gap-1.5">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true">
+          <rect x="0" y="8" width="3" height="4" rx="0.8" />
+          <rect x="5" y="5.5" width="3" height="6.5" rx="0.8" />
+          <rect x="10" y="3" width="3" height="9" rx="0.8" />
+          <rect x="15" y="0" width="3" height="12" rx="0.8" />
+        </svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-hidden="true">
+          <path d="M8 2.4c2.2 0 4.2.9 5.7 2.3l1-1.1A9.6 9.6 0 0 0 8 .8 9.6 9.6 0 0 0 1.3 3.6l1 1.1A8.1 8.1 0 0 1 8 2.4Z" />
+          <path d="M8 5.8c1.3 0 2.5.5 3.4 1.3l1-1.1A6.6 6.6 0 0 0 8 4.2c-1.7 0-3.3.6-4.4 1.8l1 1.1c.9-.8 2.1-1.3 3.4-1.3Z" />
+          <path d="M8 9.1c.6 0 1.1.2 1.5.6L8 11.4 6.5 9.7c.4-.4.9-.6 1.5-.6Z" />
+        </svg>
+        <svg width="27" height="13" viewBox="0 0 27 13" fill="none" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="currentColor" opacity="0.4" />
+          <rect x="2" y="2" width="19" height="9" rx="2.2" fill="currentColor" />
+          <path d="M24 4.5v4c.8-.3 1.5-1.2 1.5-2s-.7-1.7-1.5-2Z" fill="currentColor" opacity="0.45" />
+        </svg>
+      </div>
+    </div>
+  )
+}
+
+function IosWhatsAppFrame({
+  children,
+  detail,
+  reactions = true,
+  fixed = false,
+}: {
+  children: ReactNode
+  detail?: ReactNode
+  reactions?: boolean
+  /** Export size: exactly 412px wide, at least 912px tall, growing with the message. */
+  fixed?: boolean
+}) {
+  return (
+    <div
+      className={
+        fixed
+          ? 'relative flex min-h-[912px] w-[412px] flex-col overflow-hidden bg-[#f0ece6]'
+          : 'relative w-full overflow-hidden rounded-xl bg-[#f0ece6] shadow-sm'
+      }
+    >
       {detail}
-      <div className="flex items-center gap-2 bg-[#f6f3ee] px-3 py-2.5">
+      <IosStatusBar />
+      <div className="flex items-center gap-2 bg-[#f6f3ee] px-3 pb-2.5 pt-1">
         <div className="flex h-8 items-center gap-0.5 rounded-full bg-white/80 pl-1.5 pr-2.5 text-[12px] font-medium text-[#111b21] shadow-sm">
           <Icon name="chevron-left" size={14} />
           174
@@ -262,9 +319,9 @@ function IosWhatsAppFrame({ children, detail, reactions = true }: { children: Re
         </div>
       </div>
 
-      <div className="space-y-3 px-3 pb-3 pt-4" style={{ backgroundImage: WA_WALLPAPER, backgroundSize: '30px 34px' }}>
+      <div className={`space-y-3 px-3 pb-3 pt-4 ${fixed ? 'flex-1' : ''}`} style={{ backgroundColor: WA_CHAT_BG, backgroundImage: WA_WALLPAPER, backgroundSize: '100% auto', backgroundRepeat: 'repeat-y' }}>
         <div className="flex justify-center">
-          <span className="rounded-full bg-white px-3 py-1 text-[11px] font-medium text-[#111b21]">12 Dec 2025</span>
+          <span className={`rounded-full bg-white px-3.5 py-1 text-[13px] font-semibold text-[#111b21] ${BUBBLE_SHADOW}`}>12 Dec 2025</span>
         </div>
         {children}
         <div className={`gap-2 ${reactions ? 'flex' : 'hidden'}`}>
@@ -313,6 +370,98 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
       : []),
   ]
   const openCard = open && langs.includes(open.lang) ? cardsFor(open.lang)[open.index] : undefined
+  const noop = () => {}
+  /** The chat frame for the given languages. `exporting` renders the fixed 412px export size with no tap targets. */
+  const renderFrame = (ls: Lang[], exporting: boolean) =>
+    variant === 'text' ? (
+      <IosWhatsAppFrame reactions={false} fixed={exporting}>
+        {ls.map((l) => (
+          <ChatBubble
+            key={l}
+            text={copy.whatsapp[l]}
+            cta={copy.whatsappCta[l]}
+            showCta={copy.whatsappShow.cta}
+            cta2={copy.whatsappShow.cta2 ? copy.whatsappCta2[l] : undefined}
+          />
+        ))}
+      </IosWhatsAppFrame>
+    ) : (
+      <IosWhatsAppFrame
+        fixed={exporting}
+        detail={
+          !exporting && openCard ? (
+            <MessageDetail
+              text={openCard.text}
+              cta={openCard.cta}
+              cta2={openCard.cta2}
+              banner={openCard.banner}
+              show={copy.whatsappShow}
+              onClose={() => setOpen(null)}
+            />
+          ) : undefined
+        }
+      >
+        {ls.map((l) => {
+          const cards = cardsFor(l)
+          return (
+            <div key={l} className="space-y-1.5">
+              {copy.whatsappShow.intro && <IntroBubble text={copy.whatsappIntro[l]} />}
+              {cards.length > 1 ? (
+                <div className="-mx-3 flex snap-x scroll-pl-3 items-stretch gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none]">
+                  {cards.map((c, i) => (
+                    <RichChatBubble
+                      key={i}
+                      {...c}
+                      show={copy.whatsappShow}
+                      carousel
+                      tail={i === 0}
+                      onOpen={exporting ? noop : () => setOpen({ lang: l, index: i })}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <RichChatBubble {...cards[0]} show={copy.whatsappShow} onOpen={exporting ? noop : () => setOpen({ lang: l, index: 0 })} />
+              )}
+            </div>
+          )
+        })}
+      </IosWhatsAppFrame>
+    )
+
+  const [exportLang, setExportLang] = useState<Lang | null>(null)
+  const exportRef = useRef<HTMLDivElement>(null)
+  const toast = useStore((s) => s.toast)
+  useEffect(() => {
+    if (!exportLang) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        // The off-screen frame is the first thing to use the bold/italic weights, so make sure they are
+        // loaded before capture. Otherwise paragraph heights get measured with a wider fallback font and the
+        // image ends up with extra blank space under the text.
+        await Promise.all(
+          ['400', '500', '600', 'italic 400'].map((w) => document.fonts.load(`${w} 14px "IBM Plex Sans"`, 'Aa 123 —')),
+        )
+        await document.fonts.ready
+        // Let the off-screen frame re-lay out with the loaded fonts and decode its images before capturing.
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+        const node = exportRef.current
+        if (!node || cancelled) return
+        const dataUrl = await toPng(node, { pixelRatio: 2, cacheBust: true })
+        const a = document.createElement('a')
+        a.href = dataUrl
+        a.download = `whatsapp-${variant === 'text' ? 'text' : 'text-image'}-${exportLang}.png`
+        a.click()
+      } catch {
+        toast('Could not export the image')
+      } finally {
+        if (!cancelled) setExportLang(null)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [exportLang, variant, toast])
   return (
     <div className="space-y-2.5">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
@@ -342,53 +491,7 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
       </div>
 
       <PhoneViewport width={phoneWidth}>
-      {variant === 'text' ? (
-        <IosWhatsAppFrame reactions={false}>
-          {langs.map((l) => (
-            <ChatBubble key={l} text={copy.whatsapp[l]} cta={copy.whatsappCta[l]} showCta={copy.whatsappShow.cta} cta2={copy.whatsappShow.cta2 ? copy.whatsappCta2[l] : undefined} />
-          ))}
-        </IosWhatsAppFrame>
-      ) : (
-        <IosWhatsAppFrame
-          detail={
-            openCard ? (
-              <MessageDetail
-                text={openCard.text}
-                cta={openCard.cta}
-                cta2={openCard.cta2}
-                banner={openCard.banner}
-                show={copy.whatsappShow}
-                onClose={() => setOpen(null)}
-              />
-            ) : undefined
-          }
-        >
-          {langs.map((l) => {
-            const cards = cardsFor(l)
-            return (
-              <div key={l} className="space-y-1.5">
-                {copy.whatsappShow.intro && <IntroBubble text={copy.whatsappIntro[l]} />}
-                {cards.length > 1 ? (
-                  <div className="-mx-3 flex snap-x scroll-pl-3 items-stretch gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none]">
-                    {cards.map((c, i) => (
-                      <RichChatBubble
-                        key={i}
-                        {...c}
-                        show={copy.whatsappShow}
-                        carousel
-                        tail={i === 0}
-                        onOpen={() => setOpen({ lang: l, index: i })}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <RichChatBubble {...cards[0]} show={copy.whatsappShow} onOpen={() => setOpen({ lang: l, index: 0 })} />
-                )}
-              </div>
-            )
-          })}
-        </IosWhatsAppFrame>
-      )}
+      {renderFrame(langs, false)}
       </PhoneViewport>
 
       <div className="mt-2.5 space-y-2">
@@ -405,7 +508,21 @@ export function WhatsAppPreview({ copy, lang }: { copy: CopyFields; lang: Lang |
           </LangBlock>
         ))}
       </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {langs.map((l) => (
+          <Button key={l} variant="secondary" size="sm" icon="download" onClick={() => setExportLang(l)} disabled={exportLang !== null}>
+            {exportLang === l ? 'Exporting…' : `Download ${l === 'en' ? 'English' : 'Indonesian'}`}
+          </Button>
+        ))}
+      </div>
     </div>
+
+    {exportLang && (
+      <div aria-hidden="true" className="pointer-events-none fixed left-[-10000px] top-0">
+        <div ref={exportRef}>{renderFrame([exportLang], true)}</div>
+      </div>
+    )}
     </div>
   )
 }
